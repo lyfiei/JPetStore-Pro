@@ -1,7 +1,7 @@
 package com.csu.jpetstore.servlet.profile;
 
-import csu.web.mypetstore.domain.Account;
-import csu.web.mypetstore.service.AccountService;
+import com.csu.jpetstore.domain.Account;
+import com.csu.jpetstore.service.AccountService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
