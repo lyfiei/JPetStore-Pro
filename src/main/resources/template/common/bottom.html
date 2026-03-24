@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="bottom">
+
+    </div>
+    </div>
+    <div id="Footer">
+    <div id="Banner">
+        <div id="PoweredBy">
+            &nbsp;<a href="http://www.csu.edu.cn">www.csu.edu.cn</a>
+        </div>
+        <div id="love">
+            <th:block th:if="${session.loginAccount != null and session.loginAccount.bannerOption}">
+                <span th:text="${session.loginAccount.bannerName}"></span>
+            </th:block>
+        </div>
+    </div>
+    <script th:src="@{/js/productAuto.js}"></script>
+</div>
+
+</th:block>
+
+</body>
+</html>

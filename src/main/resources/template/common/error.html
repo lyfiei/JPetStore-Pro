@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <link rel="StyleSheet" th:href="@{/css/mypetstore.css}" type="text/css" />
+</head>
+<body>
+
+<div th:replace="~{common/top :: top}"></div>
+
+<p th:text="${session.errorMessage} ?: '错误'"></p>
+
+<div th:replace="~{common/bottom :: bottom}"></div>
+
+</body>
+</html>
