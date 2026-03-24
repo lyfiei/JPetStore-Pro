@@ -1,6 +1,6 @@
 package com.csu.jpetstore.persistence;
 
-import csu.web.mypetstore.domain.Address;
+import com.csu.jpetstore.domain.Address;
 
 import java.util.List;
 

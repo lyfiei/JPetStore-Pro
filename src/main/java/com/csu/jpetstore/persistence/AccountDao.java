@@ -1,7 +1,7 @@
 package com.csu.jpetstore.persistence;
 
 
-import csu.web.mypetstore.domain.Account;
+import com.csu.jpetstore.domain.Account;
 
 public interface AccountDao {
     Account getAccountByUsername(String username);

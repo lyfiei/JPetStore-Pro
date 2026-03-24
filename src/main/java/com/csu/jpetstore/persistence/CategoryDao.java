@@ -1,6 +1,6 @@
 package com.csu.jpetstore.persistence;
 
-import csu.web.mypetstore.domain.Category;
+import com.csu.jpetstore.domain.Category;
 
 import java.util.List;
 

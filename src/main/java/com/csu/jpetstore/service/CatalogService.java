@@ -1,14 +1,14 @@
 package com.csu.jpetstore.service;
 
-import csu.web.mypetstore.domain.Category;
-import csu.web.mypetstore.domain.Item;
-import csu.web.mypetstore.domain.Product;
-import csu.web.mypetstore.persistence.CategoryDao;
-import csu.web.mypetstore.persistence.ItemDao;
-import csu.web.mypetstore.persistence.ProductDao;
-import csu.web.mypetstore.persistence.impl.CategoryDaoImpl;
-import csu.web.mypetstore.persistence.impl.ItemDaoImpl;
-import csu.web.mypetstore.persistence.impl.ProductDaoImpl;
+import com.csu.jpetstore.domain.Category;
+import com.csu.jpetstore.domain.Item;
+import com.csu.jpetstore.domain.Product;
+import com.csu.jpetstore.persistence.CategoryDao;
+import com.csu.jpetstore.persistence.ItemDao;
+import com.csu.jpetstore.persistence.ProductDao;
+import com.csu.jpetstore.persistence.impl.CategoryDaoImpl;
+import com.csu.jpetstore.persistence.impl.ItemDaoImpl;
+import com.csu.jpetstore.persistence.impl.ProductDaoImpl;
 
 import java.util.List;
 

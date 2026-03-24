@@ -1,7 +1,7 @@
 package com.csu.jpetstore.persistence.impl;
 
-import csu.web.mypetstore.domain.Address;
-import csu.web.mypetstore.persistence.AddressDao;
+import com.csu.jpetstore.domain.Address;
+import com.csu.jpetstore.persistence.AddressDao;
 
 import java.sql.*;
 import java.util.ArrayList;

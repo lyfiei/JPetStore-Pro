@@ -1,8 +1,8 @@
 package com.csu.jpetstore.persistence.impl;
 
-import csu.web.mypetstore.domain.LineItem;
-import csu.web.mypetstore.persistence.DBUtil;
-import csu.web.mypetstore.persistence.LineItemDao;
+import com.csu.jpetstore.domain.LineItem;
+import com.csu.jpetstore.persistence.DBUtil;
+import com.csu.jpetstore.persistence.LineItemDao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

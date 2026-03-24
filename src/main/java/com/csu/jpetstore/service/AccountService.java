@@ -1,9 +1,9 @@
 package com.csu.jpetstore.service;
 
-import csu.web.mypetstore.domain.Account;
-import csu.web.mypetstore.persistence.AccountDao;
-import csu.web.mypetstore.persistence.DBUtil;
-import csu.web.mypetstore.persistence.impl.AccountDaoImpl;
+import com.csu.jpetstore.domain.Account;
+import com.csu.jpetstore.persistence.AccountDao;
+import com.csu.jpetstore.persistence.DBUtil;
+import com.csu.jpetstore.persistence.impl.AccountDaoImpl;
 
 import java.sql.Connection;
 

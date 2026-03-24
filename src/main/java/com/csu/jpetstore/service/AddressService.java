@@ -1,8 +1,8 @@
 package com.csu.jpetstore.service;
 
-import csu.web.mypetstore.domain.Address;
-import csu.web.mypetstore.persistence.AddressDao;
-import csu.web.mypetstore.persistence.impl.AddressDaoImpl;
+import com.csu.jpetstore.domain.Address;
+import com.csu.jpetstore.persistence.AddressDao;
+import com.csu.jpetstore.persistence.impl.AddressDaoImpl;
 
 import java.util.List;
 

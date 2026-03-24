@@ -1,9 +1,9 @@
 package com.csu.jpetstore.service;
 
 
-import csu.web.mypetstore.domain.LogData;
-import csu.web.mypetstore.persistence.LogDao;
-import csu.web.mypetstore.persistence.impl.LogDaoImpl;
+import com.csu.jpetstore.domain.LogData;
+import com.csu.jpetstore.persistence.LogDao;
+import com.csu.jpetstore.persistence.impl.LogDaoImpl;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;

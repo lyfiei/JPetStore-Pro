@@ -1,10 +1,10 @@
 package com.csu.jpetstore.servlet;
 
-import csu.web.mypetstore.domain.Account;
-import csu.web.mypetstore.domain.Item;
-import csu.web.mypetstore.domain.Product;
-import csu.web.mypetstore.service.CatalogService;
-import csu.web.mypetstore.service.LogService;
+import com.csu.jpetstore.domain.Account;
+import com.csu.jpetstore.domain.Item;
+import com.csu.jpetstore.domain.Product;
+import com.csu.jpetstore.service.CatalogService;
+import com.csu.jpetstore.service.LogService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

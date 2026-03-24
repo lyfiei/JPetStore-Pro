@@ -1,14 +1,14 @@
 package com.csu.jpetstore.service;
 
-import csu.web.mypetstore.domain.Item;
-import csu.web.mypetstore.domain.LineItem;
-import csu.web.mypetstore.domain.Order;
-import csu.web.mypetstore.domain.Sequence;
-import csu.web.mypetstore.persistence.*;
-import csu.web.mypetstore.persistence.impl.ItemDaoImpl;
-import csu.web.mypetstore.persistence.impl.LineItemDaoImpl;
-import csu.web.mypetstore.persistence.impl.OrderDaoImpl;
-import csu.web.mypetstore.persistence.impl.SequenceDaoImpl;
+import com.csu.jpetstore.domain.Item;
+import com.csu.jpetstore.domain.LineItem;
+import com.csu.jpetstore.domain.Order;
+import com.csu.jpetstore.domain.Sequence;
+import com.csu.jpetstore.persistence.*;
+import com.csu.jpetstore.persistence.impl.ItemDaoImpl;
+import com.csu.jpetstore.persistence.impl.LineItemDaoImpl;
+import com.csu.jpetstore.persistence.impl.OrderDaoImpl;
+import com.csu.jpetstore.persistence.impl.SequenceDaoImpl;
 
 import java.util.HashMap;
 import java.util.List;

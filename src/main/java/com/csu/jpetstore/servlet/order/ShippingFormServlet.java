@@ -1,8 +1,8 @@
 package com.csu.jpetstore.servlet.order;
 
-import csu.web.mypetstore.domain.Address;
-import csu.web.mypetstore.domain.Order;
-import csu.web.mypetstore.service.AddressService;
+import com.csu.jpetstore.domain.Address;
+import com.csu.jpetstore.domain.Order;
+import com.csu.jpetstore.service.AddressService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;

@@ -1,9 +1,9 @@
 package com.csu.jpetstore.servlet.cart;
 
-import csu.web.mypetstore.domain.Account;
-import csu.web.mypetstore.domain.Cart;
-import csu.web.mypetstore.domain.Order;
-import csu.web.mypetstore.service.OrderService;
+import com.csu.jpetstore.domain.Account;
+import com.csu.jpetstore.domain.Cart;
+import com.csu.jpetstore.domain.Order;
+import com.csu.jpetstore.service.OrderService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

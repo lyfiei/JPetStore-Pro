@@ -1,8 +1,8 @@
 package com.csu.jpetstore.servlet;
 
-import csu.web.mypetstore.domain.Account;
-import csu.web.mypetstore.domain.Address;
-import csu.web.mypetstore.service.AddressService;
+import com.csu.jpetstore.domain.Account;
+import com.csu.jpetstore.domain.Address;
+import com.csu.jpetstore.service.AddressService;
 
 import javax.servlet.*;
 import javax.servlet.http.*;

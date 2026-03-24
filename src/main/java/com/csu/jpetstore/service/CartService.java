@@ -1,10 +1,10 @@
 package com.csu.jpetstore.service;
 
-import csu.web.mypetstore.domain.Cart;
-import csu.web.mypetstore.domain.CartItem;
-import csu.web.mypetstore.domain.Item;
-import csu.web.mypetstore.persistence.CartDao;
-import csu.web.mypetstore.persistence.impl.CartDaoImpl;
+import com.csu.jpetstore.domain.Cart;
+import com.csu.jpetstore.domain.CartItem;
+import com.csu.jpetstore.domain.Item;
+import com.csu.jpetstore.persistence.CartDao;
+import com.csu.jpetstore.persistence.impl.CartDaoImpl;
 
 import java.util.List;
 

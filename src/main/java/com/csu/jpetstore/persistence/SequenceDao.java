@@ -1,6 +1,6 @@
 package com.csu.jpetstore.persistence;
 
-import csu.web.mypetstore.domain.Sequence;
+import com.csu.jpetstore.domain.Sequence;
 
 public interface SequenceDao {
 

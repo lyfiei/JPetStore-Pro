@@ -1,8 +1,8 @@
 package com.csu.jpetstore.servlet.Login;
 
-import csu.web.mypetstore.service.AccountService;
-import csu.web.mypetstore.service.EmailService;
-import csu.web.mypetstore.util.CodeUtil;
+import com.csu.jpetstore.service.AccountService;
+import com.csu.jpetstore.service.EmailService;
+import com.csu.jpetstore.util.CodeUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
