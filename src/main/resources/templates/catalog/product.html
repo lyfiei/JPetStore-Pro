@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>商品列表</title>
+  <link rel="StyleSheet" th:href="@{/css/mypetstore.css}" type="text/css" />
+</head>
+<body>
+<!-- 引入公共头部 -->
+<div th:replace="~{common/top :: top}"></div>
+
+<div id="BackLink">
+  <!-- 条件判断返回链接 -->
+  <a th:if="${not empty session.lastSearchUrl}"
+     th:href="@{/${session.lastSearchUrl}}">Return to Search Results</a>
+  <a th:unless="${not empty session.lastSearchUrl}"
+     th:href="@{/mainForm}">Return to Main Menu</a>
+</div>
+
+<div id="Catalog">
+  <h2 th:text="${session.product.name}">商品名称</h2>
+
+  <table>
+    <tr>
+      <th>Item ID</th>
+      <th>Product ID</th>
+      <th>Description</th>
+      <th>List Price</th>
+      <th>&nbsp;</th>
+    </tr>
+    <!-- 遍历商品项列表 -->
+    <tr th:each="item : ${session.itemList}">
+      <td>
+        <a th:href="@{/itemForm(itemId=${item.itemId})}" th:text="${item.itemId}">商品项ID</a>
+      </td>
+      <td th:text="${item.product.productId}">产品ID</td>
+      <td th:text="${item.attribute1 + ' ' + item.attribute2 + ' ' + item.attribute3 + ' ' + item.attribute4 + ' ' + item.attribute5 + ' ' + session.product.name}">商品描述</td>
+      <td th:text="${#numbers.formatCurrency(item.listPrice)}">$0.00</td>
+      <td>
+        <form th:action="@{/addItemToCart}" method="post">
+          <input type="hidden" name="workingItemId" th:value="${item.itemId}">
+          <button type="submit" class="Button">Add to Cart</button>
+        </form>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- 引入公共底部 -->
+<div th:replace="~{common/bottom :: bottom}"></div>
+</body>
+</html>

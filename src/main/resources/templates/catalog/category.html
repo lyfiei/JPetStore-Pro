@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品分类详情</title>
+    <link rel="StyleSheet" th:href="@{/css/mypetstore.css}" type="text/css" />
+</head>
+<body>
+<!-- 引入公共头部 -->
+<div th:replace="~{common/top :: top}"></div>
+
+<div id="BackLink">
+    <a th:href="@{/mainForm}">Return to Main Menu</a>
+</div>
+
+<div id="Catalog">
+    <!-- 展示分类名称 -->
+    <h2 th:text="${session.category.name}">分类名称</h2>
+
+    <table>
+        <tr>
+            <th>Product ID</th>
+            <th>Name</th>
+        </tr>
+        <!-- 遍历商品列表 -->
+        <tr th:each="product : ${session.productList}">
+            <td>
+                <a th:href="@{/productForm(productId=${product.productId})}" th:text="${product.productId}">商品ID</a>
+            </td>
+            <td th:text="${product.name}">商品名称</td>
+        </tr>
+    </table>
+</div>
+
+<!-- 引入公共底部 -->
+<div th:replace="~{common/bottom :: bottom}"></div>
+</body>
+</html>
