@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign On - JPetStore</title>
+    <!-- 只引入 head 片段，不引入 div！！！ -->
+    <div th:replace="common/top :: head"></div>
+</head>
+<body>
+
+<!-- 正确：顶部导航放在 body 里面 -->
+<div th:replace="common/top :: top"></div>
+
+<div id="Catalog">
+    <form action="signOn" method="post" id="loginForm">
+        <p>Please enter your username and password.</p>
+        <p id="messageBox"><font color="red" th:text="${signOnMsg}"></font></p>
+        <p>
+            Username: <input type="text" name="username" id="username"> <br />
+            Password: <input type="password" name="password" id="password"/>
+        </p>
+        <input type="button" id="loginBtn" value="Login" >
+    </form>
+
+    <p>
+        Need a username and password?
+        <a th:href="@{/registerForm}">Register Now!</a>
+    </p>
+
+    <p>
+        Or login with email verification code?
+        <a th:href="@{/signOnCodeForm}">Login with code</a>
+    </p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function() {
+        $("#loginBtn").click(function() {
+            var username = $("#username").val();
+            var password = $("#password").val();
+
+            if(username === "" || password === "") {
+                $("#messageBox").html("<font color='red'>用户名和密码不能为空</font>");
+                return;
+            }
+            $("#loginForm").submit();
+        });
+    });
+</script>
+
+<!-- 底部 -->
+<div th:replace="common/bottom :: bottom"></div>
+
+</body>
+</html>

@@ -9,9 +9,10 @@ import com.csu.jpetstore.persistence.ProductDao;
 import com.csu.jpetstore.persistence.impl.CategoryDaoImpl;
 import com.csu.jpetstore.persistence.impl.ItemDaoImpl;
 import com.csu.jpetstore.persistence.impl.ProductDaoImpl;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class CatalogService {
     private CategoryDao categoryDao;
     private ProductDao productDao;

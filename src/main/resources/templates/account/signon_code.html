@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login with Code - JPetStore</title>
+    <div th:replace="common/top :: head"></div>
+</head>
+<body>
+
+<div th:replace="common/top :: top"></div>
+
+<div id="Catalog">
+    <h2>Login with Email Verification Code</h2>
+    <p id="codeMsg"><font color="red" th:text="${signOnMsg}"></font></p>
+
+    <form id="loginForm">
+        <input type="hidden" name="email" id="hiddenEmail" />
+
+        <table>
+            <tr>
+                <td style="text-align: right; width: 80px;">Email:</td>
+                <td style="text-align: left;">
+                    <input type="email" name="email" id="emailInput" required
+                           th:value="${emailPrefill}" />
+                    <input type="button" id="sendBtn" value="Send Verification Code" />
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2"><hr/></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td style="text-align: left;">Enter the verification code you received:</td>
+            </tr>
+
+            <tr>
+                <td style="text-align: right;">Code:</td>
+                <td style="text-align: left;">
+                    <input type="text" name="code" id="codeInput" required />
+                </td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td style="text-align: left;">
+                    <input type="submit" value="Login" />
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <hr style="width: 50%; margin: 20px auto;"/>
+    <p>Back to standard login? <a th:href="@{/signOnForm}">Login with username/password</a></p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function() {
+        // 发送验证码按钮 —— 修好啦！
+        $("#sendBtn").click(function(e) {
+            e.preventDefault(); // 阻止表单冲突
+
+            var email = $("#emailInput").val().trim();
+            if(email === "") {
+                $("#codeMsg").html("<font color='red'>Please enter your email</font>");
+                return;
+            }
+
+            var $btn = $(this);
+            $btn.prop("disabled", true);
+
+            // ✅ 关键修复：URL 写成绝对路径 /sendEmailCode
+            $.ajax({
+                url: "/sendEmailCode",
+                type: "POST",
+                data: {
+                    email: email,
+                    isAjax: "true"
+                },
+                success: function(response) {
+                    if(response === "success") {
+                        $("#codeMsg").html("<font color='green'>Verification code sent!</font>");
+                        $("#hiddenEmail").val(email);
+
+                        var count = 60;
+                        var timer = setInterval(function() {
+                            $btn.val(count + "s");
+                            if(count <= 0) {
+                                clearInterval(timer);
+                                $btn.prop("disabled", false).val("Send Verification Code");
+                            }
+                            count--;
+                        }, 1000);
+                    } else {
+                        $("#codeMsg").html("<font color='red'>" + response + "</font>");
+                        $btn.prop("disabled", false);
+                    }
+                },
+                error: function() {
+                    $("#codeMsg").html("<font color='red'>Server error</font>");
+                    $btn.prop("disabled", false);
+                }
+            });
+        });
+
+        // 登录逻辑
+        $("#loginForm").submit(function(e) {
+            e.preventDefault();
+            var email = $("#hiddenEmail").val().trim();
+            var code = $("#codeInput").val().trim();
+
+            if(!email) {
+                $("#codeMsg").html("<font color='red'>Please get code first</font>");
+                return;
+            }
+            if(!code) {
+                $("#codeMsg").html("<font color='red'>Please enter code</font>");
+                return;
+            }
+
+            $.ajax({
+                url: "/emailLogin",
+                type: "POST",
+                data: { email: email, code: code },
+                success: function(response) {
+                    if (response === "success") {
+                        window.location.href = "/mainForm";
+                    } else {
+                        $("#codeMsg").html("<font color='red'>" + response + "</font>");
+                    }
+                },
+                error: function() {
+                    $("#codeMsg").html("<font color='red'>Server error</font>");
+                }
+            });
+        });
+    });
+</script>
+
+<div th:replace="common/bottom :: bottom"></div>
+
+</body>
+</html>
