@@ -4,10 +4,11 @@ import com.csu.jpetstore.domain.Account;
 import com.csu.jpetstore.persistence.AccountDao;
 import com.csu.jpetstore.persistence.DBUtil;
 import com.csu.jpetstore.persistence.impl.AccountDaoImpl;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 
-
+@Service
 public class AccountService {
     private AccountDao accountDao;
 
