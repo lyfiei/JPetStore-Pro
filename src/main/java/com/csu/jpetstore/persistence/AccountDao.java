@@ -1,10 +1,10 @@
 package com.csu.jpetstore.persistence;
 
-
 import com.csu.jpetstore.domain.Account;
+import org.apache.ibatis.annotations.Param;
 
 public interface AccountDao {
-    Account getAccountByUsername(String username);
+    Account getAccountByUsername(@Param("username") String username);
 
     Account getAccountByUsernameAndPassword(Account account);
 
@@ -20,6 +20,7 @@ public interface AccountDao {
 
     void updateSignon(Account account);
 
-    Account getAccountByEmail(String email);
+    Account getAccountByEmail(@Param("email") String email);
 
 }
+

@@ -47,6 +47,7 @@ public class AccountController {
         Account loginAccount = accountService.getAccount(username, password);
 
         if (loginAccount == null) {
+            System.out.println("登录失败：查询不到用户 " + username); // 临时调试
             model.addAttribute("signOnMsg", "用户名或者密码错误");
             return "account/signon";
         } else {

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.jpetstore.persistence.AccountDao">
+
+    <resultMap id="accountResult" type="Account">
+        <id property="username" column="USERID"/>
+        <result property="email" column="EMAIL"/>
+        <result property="firstName" column="FIRSTNAME"/>
+        <result property="lastName" column="LASTNAME"/>
+        <result property="status" column="STATUS"/>
+        <result property="address1" column="ADDR1"/>
+        <result property="address2" column="ADDR2"/>
+        <result property="city" column="CITY"/>
+        <result property="state" column="STATE"/>
+        <result property="zip" column="ZIP"/>
+        <result property="country" column="COUNTRY"/>
+        <result property="phone" column="PHONE"/>
+        <result property="languagePreference" column="LANGPREF"/>
+        <result property="favouriteCategoryId" column="FAVCATEGORY"/>
+        <result property="listOption" column="MYLISTOPT"/>
+        <result property="bannerOption" column="BANNEROPT"/>
+        <result property="bannerName" column="BANNERNAME"/>
+    </resultMap>
+
+    <select id="getAccountByUsername" parameterType="string" resultMap="accountResult">
+        SELECT
+            ACCOUNT.USERID,
+            ACCOUNT.EMAIL,
+            ACCOUNT.FIRSTNAME,
+            ACCOUNT.LASTNAME,
+            ACCOUNT.STATUS,
+            ACCOUNT.ADDR1 AS address1,
+            ACCOUNT.ADDR2 AS address2,
+            ACCOUNT.CITY,
+            ACCOUNT.STATE,
+            ACCOUNT.ZIP,
+            ACCOUNT.COUNTRY,
+            ACCOUNT.PHONE,
+            PROFILE.LANGPREF AS languagePreference,
+            PROFILE.FAVCATEGORY AS favouriteCategoryId,
+            PROFILE.MYLISTOPT AS listOption,
+            PROFILE.BANNEROPT AS bannerOption
+        FROM ACCOUNT
+                 LEFT JOIN PROFILE ON ACCOUNT.USERID = PROFILE.USERID
+        WHERE ACCOUNT.USERID = #{username}
+    </select>
+
+
+    <insert id="insertAccount" parameterType="Account">
+        INSERT INTO ACCOUNT (USERID, EMAIL, FIRSTNAME, LASTNAME, STATUS, ADDR1, ADDR2, CITY, STATE, ZIP, COUNTRY, PHONE)
+        VALUES (#{username}, #{email}, #{firstName}, #{lastName}, #{status}, #{address1}, #{address2}, #{city}, #{state}, #{zip}, #{country}, #{phone})
+    </insert>
+
+    <insert id="insertProfile" parameterType="Account">
+        INSERT INTO PROFILE (USERID, LANGPREF, FAVCATEGORY, MYLISTOPT, BANNEROPT)
+        VALUES (#{username}, #{languagePreference}, #{favouriteCategoryId}, #{listOption}, #{bannerOption})
+    </insert>
+
+    <insert id="insertSignon" parameterType="Account">
+        INSERT INTO SIGNON (USERNAME, PASSWORD)
+        VALUES (#{username}, #{password})
+    </insert>
+
+    <update id="updateAccount" parameterType="Account">
+        UPDATE ACCOUNT SET
+                           EMAIL=#{email},
+                           FIRSTNAME=#{firstName},
+                           LASTNAME=#{lastName},
+                           ADDR1=#{address1},
+                           ADDR2=#{address2},
+                           CITY=#{city},
+                           STATE=#{state},
+                           ZIP=#{zip},
+                           COUNTRY=#{country},
+                           PHONE=#{phone}
+        WHERE USERID=#{username}
+    </update>
+
+    <update id="updateProfile" parameterType="Account">
+        UPDATE PROFILE SET
+                           LANGPREF=#{languagePreference},
+                           FAVCATEGORY=#{favouriteCategoryId},
+                           MYLISTOPT=#{listOption},
+                           BANNEROPT=#{bannerOption}
+        WHERE USERID=#{username}
+    </update>
+
+    <update id="updateSignon" parameterType="Account">
+        UPDATE SIGNON SET PASSWORD=#{password} WHERE USERNAME=#{username}
+    </update>
+
+    <select id="getAccountByEmail" parameterType="string" resultType="Account">
+        SELECT USERID, EMAIL
+        FROM ACCOUNT
+        WHERE EMAIL = #{email}
+    </select>
+
+    <select id="getAccountByUsernameAndPassword" parameterType="Account" resultMap="accountResult">
+        SELECT
+            A.USERID, A.EMAIL, A.FIRSTNAME, A.LASTNAME, A.STATUS, A.ADDR1, A.ADDR2,
+            A.CITY, A.STATE, A.ZIP, A.COUNTRY, A.PHONE,
+            P.LANGPREF AS languagePreference,
+            P.FAVCATEGORY AS favouriteCategoryId,
+            P.MYLISTOPT AS listOption,
+            P.BANNEROPT AS bannerOption,
+            B.BANNERNAME
+        FROM ACCOUNT A
+                 INNER JOIN SIGNON S ON A.USERID = S.USERNAME
+                 INNER JOIN PROFILE P ON A.USERID = P.USERID
+                 LEFT JOIN BANNERDATA B ON P.FAVCATEGORY = B.FAVCATEGORY
+        WHERE S.USERNAME = #{username}
+          AND S.PASSWORD = #{password}
+    </select>
+</mapper>

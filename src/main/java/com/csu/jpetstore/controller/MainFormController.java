@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class MainFormController {
 
-    @GetMapping("/main")
+    @GetMapping("/mainForm")
     public String main() {
         return "catalog/main";
     }
