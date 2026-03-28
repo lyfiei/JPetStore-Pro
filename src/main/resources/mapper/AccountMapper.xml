@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.csu.jpetstore.persistence.AccountDao">
+
+    <!-- 1. 根据用户名查询账户 -->
+    <select id="getAccountByUsername" resultType="com.csu.jpetstore.domain.Account">
+        SELECT
+            ACCOUNT.USERID,
+            ACCOUNT.EMAIL,
+            ACCOUNT.FIRSTNAME,
+            ACCOUNT.LASTNAME,
+            ACCOUNT.STATUS,
+            ACCOUNT.ADDR1 AS address1,
+            ACCOUNT.ADDR2 AS address2,
+            ACCOUNT.CITY,
+            ACCOUNT.STATE,
+            ACCOUNT.ZIP,
+            ACCOUNT.COUNTRY,
+            ACCOUNT.PHONE,
+            PROFILE.LANGPREF AS languagePreference,
+            PROFILE.FAVCATEGORY AS favouriteCategoryId,
+            PROFILE.MYLISTOPT AS listOption,
+            PROFILE.BANNEROPT AS bannerOption
+        FROM ACCOUNT
+                 LEFT JOIN PROFILE ON ACCOUNT.USERID = PROFILE.USERID
+        WHERE ACCOUNT.USERID = #{username}
+    </select>
+
+    <!-- 2. 账号密码登录 -->
+    <select id="getAccountByUsernameAndPassword" resultType="com.csu.jpetstore.domain.Account">
+        SELECT
+            SIGNON.USERNAME,
+            ACCOUNT.EMAIL,
+            ACCOUNT.FIRSTNAME,
+            ACCOUNT.LASTNAME,
+            ACCOUNT.STATUS,
+            ACCOUNT.ADDR1 AS address1,
+            ACCOUNT.ADDR2 AS address2,
+            ACCOUNT.CITY,
+            ACCOUNT.STATE,
+            ACCOUNT.ZIP,
+            ACCOUNT.COUNTRY,
+            ACCOUNT.PHONE,
+            PROFILE.LANGPREF AS languagePreference,
+            PROFILE.FAVCATEGORY AS favouriteCategoryId,
+            PROFILE.MYLISTOPT AS listOption,
+            PROFILE.BANNEROPT AS bannerOption,
+            BANNERDATA.BANNERNAME
+        FROM ACCOUNT, PROFILE, SIGNON, BANNERDATA
+        WHERE ACCOUNT.USERID = #{username}
+          AND SIGNON.PASSWORD = #{password}
+          AND SIGNON.USERNAME = ACCOUNT.USERID
+          AND PROFILE.USERID = ACCOUNT.USERID
+          AND PROFILE.FAVCATEGORY = BANNERDATA.FAVCATEGORY
+    </select>
+
+    <!-- 3. 根据邮箱查询账户 -->
+    <select id="getAccountByEmail" resultType="com.csu.jpetstore.domain.Account">
+        SELECT * FROM ACCOUNT WHERE EMAIL = #{email}
+    </select>
+
+    <!-- 4. 插入账户 -->
+    <insert id="insertAccount">
+        INSERT INTO ACCOUNT (USERID, EMAIL, FIRSTNAME, LASTNAME, STATUS, ADDR1, ADDR2, CITY, STATE, ZIP, COUNTRY, PHONE)
+        VALUES (#{username}, #{email}, #{firstName}, #{lastName}, 'OK', #{address1}, #{address2}, #{city}, #{state}, #{zip}, #{country}, #{phone})
+    </insert>
+
+    <!-- 5. 插入 Profile -->
+    <insert id="insertProfile">
+        INSERT INTO PROFILE (USERID, LANGPREF, FAVCATEGORY, MYLISTOPT, BANNEROPT)
+        VALUES (#{username}, #{languagePreference}, #{favouriteCategoryId}, #{listOption}, #{bannerOption})
+    </insert>
+
+    <!-- 6. 插入 Signon -->
+    <insert id="insertSignon">
+        INSERT INTO SIGNON (USERNAME, PASSWORD) VALUES (#{username}, #{password})
+    </insert>
+
+    <!-- 7. 更新账户 -->
+    <update id="updateAccount">
+        UPDATE ACCOUNT SET
+                           EMAIL=#{email},
+                           FIRSTNAME=#{firstName},
+                           LASTNAME=#{lastName},
+                           ADDR1=#{address1},
+                           ADDR2=#{address2},
+                           CITY=#{city},
+                           STATE=#{state},
+                           ZIP=#{zip},
+                           COUNTRY=#{country},
+                           PHONE=#{phone}
+        WHERE USERID=#{username}
+    </update>
+
+    <!-- 8. 更新 Profile -->
+    <update id="updateProfile">
+        UPDATE PROFILE SET
+                           LANGPREF=#{languagePreference},
+                           FAVCATEGORY=#{favouriteCategoryId},
+                           MYLISTOPT=#{listOption},
+                           BANNEROPT=#{bannerOption}
+        WHERE USERID=#{username}
+    </update>
+
+    <!-- 9. 更新 Signon -->
+    <update id="updateSignon">
+        UPDATE SIGNON SET PASSWORD=#{password} WHERE USERNAME=#{username}
+    </update>
+
+</mapper>

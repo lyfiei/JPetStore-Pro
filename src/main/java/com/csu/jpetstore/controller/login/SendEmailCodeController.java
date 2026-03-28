@@ -4,6 +4,7 @@ import com.csu.jpetstore.service.AccountService;
 import com.csu.jpetstore.service.EmailService;
 import com.csu.jpetstore.util.CodeUtil;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SendEmailCodeController {
 
-    private final AccountService accountService = new AccountService();
+    @Autowired
+    private AccountService accountService;
 
     @PostMapping("/sendEmailCode")
     public String sendEmailCode(
