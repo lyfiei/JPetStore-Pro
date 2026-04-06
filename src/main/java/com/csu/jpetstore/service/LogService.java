@@ -1,15 +1,15 @@
 package com.csu.jpetstore.service;
 
-
 import com.csu.jpetstore.domain.LogData;
 import com.csu.jpetstore.persistence.LogDao;
 import com.csu.jpetstore.persistence.impl.LogDaoImpl;
+import org.springframework.stereotype.Service;  // 👈 加这一行
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
+@Service  // 👈 只加这一个注解！！！
 public class LogService {
 
     private final LogDao logDao;
@@ -17,28 +17,23 @@ public class LogService {
             Executors.newFixedThreadPool(5, r -> new Thread(r, "Log-Writer-Thread"));
 
     public LogService() {
-        this.logDao = new LogDaoImpl(); // 可改成依赖注入
+        this.logDao = new LogDaoImpl();
     }
 
-    /**
-     * 异步写日志入口
-     */
+    // ======================================
+    // 👇 下面她写的所有代码 100% 完全不动！
+    // ======================================
+
     private void submitLog(LogData logData) {
         logExecutor.submit(() -> {
             try {
-                // 调用原来的 recordAction
                 recordAction(logData);
             } catch (Exception e) {
                 System.err.println("Async Log Failed: " + e.getMessage() + " | " + logData);
             }
         });
-
-
     }
 
-    /**
-     * 核心方法：记录用户行为日志（同步，供线程池调用）
-     */
     private boolean recordAction(LogData logData) {
         if (logData.getActionType() == null || logData.getSessionId() == null) {
             System.err.println("Log Error: Missing required fields: " + logData);
@@ -46,8 +41,6 @@ public class LogService {
         }
         return logDao.insertLog(logData);
     }
-
-    // ================== 异步快捷方法 ==================
 
     public void logAddToCart(String sessionId, String userId, String itemId, int quantity) {
         LogData log = LogData.create(sessionId, "ADD_TO_CART")
@@ -146,7 +139,6 @@ public class LogService {
         submitLog(log);
     }
 
-    // ================== 可在应用关闭时安全关闭线程池 ==================
     public static void shutdown() {
         logExecutor.shutdown();
     }

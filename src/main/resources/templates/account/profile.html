@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/top :: head}">
+    <!-- 这里的 head 会被 top.html 里的 head 替换 -->
+</head>
+<body>
+<div th:replace="~{common/top :: top}"></div>
+
+<div id="Catalog">
+    <!-- 修复：增加非空判断，防止 contains 报错 -->
+    <div id="updateNotice" style="font-weight: bold; margin-bottom: 10px;" th:if="${updateMsg != null}">
+        <span th:text="${updateMsg}"
+              th:style="${#strings.contains(updateMsg, '成功')} ? 'color: green;' : 'color: red;'"></span>
+    </div>
+
+    <h2>Account Information</h2>
+
+    <!-- 这里的 action 指向 ProfileController 的 PostMapping -->
+    <form id="profileForm" th:action="@{/updateProfile}" method="post">
+        <table class="profile-table">
+            <tr>
+                <td class="label">Username:</td>
+                <td th:text="${account.username}"></td>
+            </tr>
+            <tr>
+                <td class="label">First Name:</td>
+                <td><input type="text" name="firstName" th:value="${account.firstName}" required /></td>
+            </tr>
+            <tr>
+                <td class="label">Last Name:</td>
+                <td><input type="text" name="lastName" th:value="${account.lastName}" required /></td>
+            </tr>
+            <tr>
+                <td class="label">Email:</td>
+                <td>
+                    <input type="email" name="email" id="email" th:value="${account.email}" required />
+                    <span id="emailMsg"></span>
+                </td>
+            </tr>
+            <tr><td class="label">Phone:</td><td><input type="text" name="phone" th:value="${account.phone}" /></td></tr>
+            <tr><td class="label">Address 1:</td><td><input type="text" name="address1" th:value="${account.address1}" /></td></tr>
+            <tr><td class="label">Address 2:</td><td><input type="text" name="address2" th:value="${account.address2}" /></td></tr>
+            <tr><td class="label">City:</td><td><input type="text" name="city" th:value="${account.city}" /></td></tr>
+            <tr><td class="label">State:</td><td><input type="text" name="state" th:value="${account.state}" /></td></tr>
+            <tr><td class="label">Zip:</td><td><input type="text" name="zip" th:value="${account.zip}" /></td></tr>
+            <tr><td class="label">Country:</td><td><input type="text" name="country" th:value="${account.country}" /></td></tr>
+        </table>
+
+        <h2>Profile Information</h2>
+        <p>
+            Language Preference:
+            <select name="languagePreference">
+                <option value="english" th:selected="${account.languagePreference == 'english'}">English</option>
+                <option value="chinese" th:selected="${account.languagePreference == 'chinese'}">Chinese</option>
+            </select> <br />
+
+            Favourite Category:
+            <select name="favouriteCategoryId">
+                <option value="">-- Select --</option>
+                <option value="FISH" th:selected="${account.favouriteCategoryId == 'FISH'}">Fish</option>
+                <option value="DOGS" th:selected="${account.favouriteCategoryId == 'DOGS'}">Dogs</option>
+                <option value="CATS" th:selected="${account.favouriteCategoryId == 'CATS'}">Cats</option>
+                <option value="BIRDS" th:selected="${account.favouriteCategoryId == 'BIRDS'}">Birds</option>
+                <option value="REPTILES" th:selected="${account.favouriteCategoryId == 'REPTILES'}">Reptiles</option>
+            </select> <br />
+
+            <!-- 注意：Checkbox 在传值给 Spring 时，如果未选中通常不传值，后端需要处理 -->
+            <input type="checkbox" name="listOption" th:checked="${account.listOption}" /> Enable MyList<br />
+            <input type="checkbox" name="bannerOption" th:checked="${account.bannerOption}" /> Display Banner<br />
+        </p>
+
+        <input type="submit" value="Save Changes" class="Button"/>
+    </form>
+</div>
+
+<!-- 引入 jQuery，确保路径正确 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script th:inline="javascript">
+    $(function() {
+        // 校验邮箱是否存在
+        $("#email").on("blur", function() {
+            var email = $(this).val();
+            var validateUrl = /*[[@{/validateAccount}]]*/ '/validateAccount';
+            if(email && email.trim() !== "") {
+                $.ajax({
+                    url: validateUrl,
+                    type: "GET",
+                    data: { email: email },
+                    success: function(response) {
+                        if(response === "exist") {
+                            $("#emailMsg").html("<font color='red'>该邮箱已被其他用户使用</font>");
+                        } else {
+                            $("#emailMsg").html("<font color='green'>邮箱可用</font>");
+                        }
+                    }
+                });
+            }
+        });
+
+        // 异步提交更新表单
+        $("#profileForm").submit(function(e) {
+            e.preventDefault();
+
+            var actionUrl = $(this).attr("action");
+            var mainUrl = /*[[@{/mainForm}]]*/ '/mainForm';
+            var loginUrl = /*[[@{/signOnForm}]]*/ '/signOnForm';
+
+            $.ajax({
+                url: actionUrl,
+                type: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    if(response === "success") {
+                        alert("信息修改成功！");
+                        window.location.href = mainUrl;
+                    } else if(response === "session_expired") {
+                        alert("会话已过期，请重新登录");
+                        window.location.href = loginUrl;
+                    } else {
+                        // 显示后端返回的错误信息
+                        alert("修改失败：" + response);
+                    }
+                },
+                error: function() {
+                    alert("网络请求异常，请稍后再试");
+                }
+            });
+        });
+    });
+</script>
+
+<div th:replace="~{common/bottom :: bottom}"></div>
+</body>
+</html>
