@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/top :: head}">
+    <meta charset="UTF-8">
+    <title>Checkout - MyPetStore</title>
+</head>
+<body th:fragment="checkout">
+<div th:replace="~{common/top :: top}"></div>
+
+<div id="BackLink">
+    <a th:href="@{/cartForm}">Return to Shopping Cart</a>
+</div>
+
+<div id="Catalog">
+    <h2>Checkout Summary</h2>
+
+    <table>
+        <tr>
+            <td><b>Item ID</b></td>
+            <td><b>Product ID</b></td>
+            <td><b>Description</b></td>
+            <td><b>In Stock?</b></td>
+            <td><b>Quantity</b></td>
+            <td><b>List Price</b></td>
+            <td><b>Total Cost</b></td>
+        </tr>
+
+        <tr th:each="cartItem : ${session.cart.cartItems}">
+            <td>
+                <a th:href="@{/itemForm(itemId=${cartItem.item.itemId})}" th:text="${cartItem.item.itemId}">I1</a>
+            </td>
+            <td th:text="${cartItem.item.product.productId}">P1</td>
+            <td>
+                <span th:text="${cartItem.item.attribute1 + ' ' + cartItem.item.attribute2 + ' ' + cartItem.item.attribute3 + ' ' + cartItem.item.attribute4 + ' ' + cartItem.item.attribute5 + ' ' + cartItem.item.product.name}">Description</span>
+            </td>
+            <td>
+                <span th:if="${cartItem.inStock}">Yes</span>
+                <span th:unless="${cartItem.inStock}">No</span>
+            </td>
+            <td th:text="${cartItem.quantity}">1</td>
+            <td th:text="'$' + ${#numbers.formatDecimal(cartItem.item.listPrice, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+            <td th:text="'$' + ${#numbers.formatDecimal(cartItem.total, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+        </tr>
+
+        <tr>
+            <td colspan="7">
+                Sub Total:
+                <span th:text="'$' + ${#numbers.formatDecimal(session.cart.subTotal, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
+            </td>
+        </tr>
+    </table>
+
+    <br/>
+    <div class="pay">
+        <h3 align="middle">Payment Method</h3>
+
+        <div style="text-align: center;">
+            <a th:href="@{/alipayPay}">
+                <img th:src="@{/images/alipayPay.png}" alt="支付宝支付"/>
+            </a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <a th:href="@{/weChatPay}">
+                <img th:src="@{/images/WeChatPay.png}" alt="微信支付"/>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/bottom :: bottom}"></div>
+
+</body>
+</html>

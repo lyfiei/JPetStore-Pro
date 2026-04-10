@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.jpetstore.persistence.mapper.CartMapper">
+
+    <resultMap id="CartItemResultMap" type="com.csu.jpetstore.domain.CartItem">
+        <id property="item.itemId" column="item_id"/>
+        <result property="inStock" column="in_stock"/>
+        <result property="quantity" column="quantity"/>
+        <association property="item" javaType="com.csu.jpetstore.domain.Item">
+            <id property="itemId" column="item_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="listPrice" column="list_price"/>
+            <result property="attribute1" column="attr1"/>
+            <result property="attribute2" column="attr2"/>
+            <result property="attribute3" column="attr3"/>
+            <result property="attribute4" column="attr4"/>
+            <result property="attribute5" column="attr5"/>
+            <association property="product" javaType="com.csu.jpetstore.domain.Product">
+                <id property="productId" column="product_id"/>
+                <result property="description" column="description"/>
+                <result property="name" column="name"/>
+            </association>
+        </association>
+    </resultMap>
+
+    <select id="getCartItemsByUserId" resultMap="CartItemResultMap">
+        SELECT
+            c.item_id,
+            c.in_stock,
+            c.quantity,
+            c.product_id,
+            c.list_price,
+            i.ATTR1 AS attr1,
+            i.ATTR2 AS attr2,
+            i.ATTR3 AS attr3,
+            i.ATTR4 AS attr4,
+            i.ATTR5 AS attr5,
+            p.name,
+            p.description
+        FROM cart c
+                 JOIN item i ON c.item_id = i.ITEMID
+                 JOIN product p ON c.product_id = p.PRODUCTID
+        WHERE c.user_id = #{userId}
+    </select>
+
+    <select id="getCartItem" resultMap="CartItemResultMap">
+        SELECT
+            c.item_id,
+            c.in_stock,
+            c.quantity,
+            c.product_id,
+            c.list_price,
+            i.ATTR1 AS attr1,
+            i.ATTR2 AS attr2,
+            i.ATTR3 AS attr3,
+            i.ATTR4 AS attr4,
+            i.ATTR5 AS attr5,
+            p.name,
+            p.description
+        FROM cart c
+                 JOIN item i ON c.item_id = i.ITEMID
+                 JOIN product p ON c.product_id = p.PRODUCTID
+        WHERE c.user_id = #{userId} AND c.item_id = #{itemId}
+    </select>
+
+    <insert id="insertCartItem" parameterType="com.csu.jpetstore.domain.CartItem">
+        INSERT INTO cart (user_id, item_id, product_id, description, in_stock, quantity, list_price)
+        VALUES (
+                   #{userId},
+                   #{item.itemId},
+                   #{item.productId},
+                   #{item.product.description},
+                   #{inStock},
+                   #{quantity},
+                   #{item.listPrice}
+               )
+    </insert>
+
+    <update id="updateQuantity">
+        UPDATE cart
+        SET quantity = #{quantity}
+        WHERE user_id = #{userId} AND item_id = #{itemId}
+    </update>
+
+    <delete id="deleteCartItem">
+        DELETE FROM cart
+        WHERE user_id = #{userId} AND item_id = #{itemId}
+    </delete>
+
+    <delete id="clearCart">
+        DELETE FROM cart WHERE user_id = #{userId}
+    </delete>
+
+</mapper>
