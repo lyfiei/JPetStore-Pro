@@ -1,3 +1,4 @@
+<!-- templates/order/viewOrder.html -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -64,25 +65,14 @@
                                 <th>Price</th>
                                 <th>Total</th>
                             </tr>
-
-                            <!--                            <c:forEach items="${sessionScope.order.lineItems}" var="item">-->
                             <tr th:each="item : ${order.lineItems}">
                                 <td>
                                     <a th:href="'/catalog/viewItem?itemId='+${item.item.itemId}" th:text="${item.item.itemId}"></a>
                                 </td>
                                 <td>
-                                    <!--                                        <c:choose>-->
-                                    <!--                                            <c:when test="${item.item != null}">-->
-                                    <!--                                                ${item.item.product.name}-->
-                                    <!--                                            </c:when>-->
-                                    <!--                                            <c:otherwise><i>Description unavailable</i></c:otherwise>-->
-                                    <!--                                        </c:choose>-->
                                     <span th:text="${item.item != null}?${item.item.itemId}:'Description unavailable'"></span>
                                 </td>
-                                <!--                                <td>${item.quantity}</td>-->
                                 <td th:text="${item.quantity}"></td>
-                                <!--                                    <td><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0.00"/></td>-->
-                                <!--                                    <td><fmt:formatNumber value="${item.total}" pattern="#,##0.00"/></td>-->
                                 <td th:text="'$'+${#numbers.formatDecimal(item.unitPrice,1,2)}"></td>
                                 <td th:text="'$'+${#numbers.formatDecimal(item.total,1,2)}"></td>
                             </tr>
@@ -90,7 +80,6 @@
                             <tr>
                                 <th colspan="5">
                                     Total:
-                                    <!--                                    <fmt:formatNumber value="${sessionScope.order.totalPrice}" pattern="#,##0.00"/>-->
                                     <span th:text="'$'+${#numbers.formatDecimal(order.totalPrice,1,2)}"></span>
                                 </th>
                             </tr>
