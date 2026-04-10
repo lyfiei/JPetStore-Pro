@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.csu.jpetstore.persistence.mapper.CartMapper">
+<mapper namespace="com.csu.jpetstore.mapper.CartMapper">
 
     <resultMap id="CartItemResultMap" type="com.csu.jpetstore.domain.CartItem">
         <id property="item.itemId" column="item_id"/>

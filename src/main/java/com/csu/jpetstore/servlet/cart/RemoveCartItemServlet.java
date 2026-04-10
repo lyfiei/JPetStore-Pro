@@ -27,7 +27,7 @@ public class RemoveCartItemServlet extends HttpServlet {
         Cart cart = (Cart) session.getAttribute("cart");
         String workingItemId = req.getParameter("workingItemId");
 
-        CartService cartservice = new CartService(new CartDaoImpl());
+        CartService cartservice = new CartService();
         Account account = (Account) session.getAttribute("loginAccount");
         LogService logService = new LogService();
 

@@ -46,7 +46,7 @@ public class UpdateCartServlet extends HttpServlet {
 
         try {
             int quantity = Integer.parseInt(quantityStr);
-            CartService cartService = new CartService(new CartDaoImpl());
+            CartService cartService = new CartService();
 
             // 3. 核心业务逻辑（保留你原本的判断逻辑）
             if (account == null) {

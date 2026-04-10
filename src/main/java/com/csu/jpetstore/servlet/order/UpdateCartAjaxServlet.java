@@ -22,7 +22,7 @@ public class UpdateCartAjaxServlet extends HttpServlet {
         int quantity = Integer.parseInt(req.getParameter("quantity"));
 
         Account account = (Account) session.getAttribute("loginAccount");
-        CartService cartService = new CartService(new CartDaoImpl());
+        CartService cartService = new CartService();
 
         if (account == null) {
             cart.setQuantityByItemId(itemId, quantity);

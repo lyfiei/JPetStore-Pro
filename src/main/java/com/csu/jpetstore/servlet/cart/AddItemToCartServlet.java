@@ -8,8 +8,11 @@ import com.csu.jpetstore.persistence.impl.CartDaoImpl;
 import com.csu.jpetstore.service.CartService;
 import com.csu.jpetstore.service.CatalogService;
 import com.csu.jpetstore.service.LogService;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
+@WebServlet("/addItemToCart")
 public class AddItemToCartServlet extends HttpServlet {
 
     private static final String CART_FORM = "/WEB-INF/jsp/cart/cart.jsp";
@@ -27,7 +31,12 @@ public class AddItemToCartServlet extends HttpServlet {
 
         HttpSession session = req.getSession();
         Cart cart = (Cart) session.getAttribute("cart");
-        CartService cartService = new CartService(new CartDaoImpl());
+        
+        // 从 Spring 容器获取 Bean
+        WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        CartService cartService = context.getBean(CartService.class);
+        CatalogService catalogService = context.getBean(CatalogService.class);
+        
         Account account = (Account) session.getAttribute("loginAccount");
         if (account == null) {
             //resp.sendRedirect("signonForm");
@@ -35,7 +44,6 @@ public class AddItemToCartServlet extends HttpServlet {
             if (cart == null) {
                 cart = new Cart();
             }
-            CatalogService catalogService = new CatalogService();
             Item item = catalogService.getItem(workingItemId);
             // 1. 内存 Cart 添加商品
             CartItem cartItem = cart.addItem(item, catalogService.isItemInStock(item.getItemId()));

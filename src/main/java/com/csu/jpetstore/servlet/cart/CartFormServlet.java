@@ -28,7 +28,7 @@ public class CartFormServlet extends HttpServlet {
                 cart = new Cart();
             }
         }else{
-            CartService cartService = new CartService(new CartDaoImpl());
+            CartService cartService = new CartService();
             // 从数据库取该用户的购物车
             List<CartItem> cartItems = cartService.getCartItemsByUserId(account.getUsername());
             // 计算小计和数量
