@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>商品详情</title>
@@ -9,43 +9,46 @@
 <div th:replace="~{common/top :: top}"></div>
 
 <div id="BackLink">
-    <!-- 条件判断返回链接 -->
-    <a th:if="${not empty session.lastSearchUrl}"
-       th:href="@{/${session.lastSearchUrl}}">Return to Search Results</a>
-    <a th:unless="${not empty session.lastSearchUrl}"
-       th:href="@{/productForm(productId=${session.product.productId})}"
-       th:text="'Return to ' + ${session.product.productId}">Return to Product</a>
+    <a th:if="${session.lastSearchUrl != null}"
+       th:href="@{ '/' + ${session.lastSearchUrl} }">Return to Search Results</a>
+
+    <a th:unless="${session.lastSearchUrl != null}"
+       th:href="@{/catalog/product(productId=${product.productId})}"
+       th:text="'Return to ' + ${product.productId}">Return to Product</a>
 </div>
 
 <div id="Catalog">
     <table>
         <tr>
-            <td th:text="${session.product.description}">商品描述</td>
+            <td th:text="${product.description}">商品描述</td>
         </tr>
         <tr>
-            <td><b th:text="${session.item.itemId}">商品项ID</b></td>
+            <td><b th:text="${item.itemId}">商品项ID</b></td>
         </tr>
         <tr>
             <td>
-                <b><font size="4" th:text="${session.item.attribute1 + ' ' + session.item.attribute2 + ' ' + session.item.attribute3 + ' ' + session.item.attribute4 + ' ' + session.item.attribute5 + ' ' + session.product.name}">
-                    商品属性及名称
-                </font></b>
+                <b>
+                    <span style="font-size: large;">
+                        [[${item.attribute1}]] [[${item.attribute2}]] [[${item.attribute3}]]
+                        [[${item.attribute4}]] [[${item.attribute5}]] [[${product.name}]]
+                    </span>
+                </b>
             </td>
         </tr>
         <tr>
-            <td th:text="${session.product.name}">商品名称</td>
+            <td th:text="${product.name}">商品名称</td>
         </tr>
         <tr>
-            <td th:if="${session.item.quantity <= 0}">Back ordered.</td>
-            <td th:if="${session.item.quantity > 0}" th:text="${session.item.quantity + ' in stock.'}">库存数量</td>
+            <td th:if="${item.quantity <= 0}">Back ordered.</td>
+            <td th:if="${item.quantity > 0}" th:text="${item.quantity + ' in stock.'}">库存数量</td>
         </tr>
         <tr>
-            <td th:text="${#numbers.formatCurrency(session.item.listPrice)}">$0.00</td>
+            <td th:text="${#numbers.formatCurrency(item.listPrice)}">$0.00</td>
         </tr>
         <tr>
             <td>
                 <form th:action="@{/addItemToCart}" method="post">
-                    <input type="hidden" name="workingItemId" th:value="${session.item.itemId}">
+                    <input type="hidden" name="workingItemId" th:value="${item.itemId}">
                     <button type="submit" class="Button">Add to Cart</button>
                 </form>
             </td>

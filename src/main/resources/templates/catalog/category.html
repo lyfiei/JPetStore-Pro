@@ -10,12 +10,12 @@
 <div th:replace="~{common/top :: top}"></div>
 
 <div id="BackLink">
-    <a th:href="@{/mainForm}">Return to Main Menu</a>
+    <a th:href="@{/catalog/main}">Return to Main Menu</a>
 </div>
 
 <div id="Catalog">
     <!-- 展示分类名称 -->
-    <h2 th:text="${session.category.name}">分类名称</h2>
+    <h2 th:text="${category.name}">分类名称</h2>
 
     <table>
         <tr>
@@ -23,9 +23,9 @@
             <th>Name</th>
         </tr>
         <!-- 遍历商品列表 -->
-        <tr th:each="product : ${session.productList}">
+        <tr th:each="product : ${productList}">
             <td>
-                <a th:href="@{/productForm(productId=${product.productId})}" th:text="${product.productId}">商品ID</a>
+                <a th:href="@{/catalog/product(productId=${product.productId})}" th:text="${product.productId}">商品ID</a>
             </td>
             <td th:text="${product.name}">商品名称</td>
         </tr>
