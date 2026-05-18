@@ -3,9 +3,9 @@ package com.csu.jpetstore.service;
 import com.csu.jpetstore.domain.Category;
 import com.csu.jpetstore.domain.Item;
 import com.csu.jpetstore.domain.Product;
-import com.csu.jpetstore.persistence.CategoryMapper;
-import com.csu.jpetstore.persistence.ItemMapper;
-import com.csu.jpetstore.persistence.ProductMapper;
+import com.csu.jpetstore.mapper.CategoryMapper;
+import com.csu.jpetstore.mapper.ItemMapper;
+import com.csu.jpetstore.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

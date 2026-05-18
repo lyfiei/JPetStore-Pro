@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 
 // 只加这一行 @MapperScan ！！！
-@MapperScan({"com.csu.jpetstore.persistence", "com.csu.jpetstore.mapper"})
+@MapperScan("com.csu.jpetstore.mapper")
 @SpringBootApplication
 @ServletComponentScan("com.csu.jpetstore.servlet")
 public class JPetStoreApplication {

@@ -1,4 +1,4 @@
-package com.csu.jpetstore.persistence;
+package com.csu.jpetstore.mapper;
 
 import com.csu.jpetstore.domain.Item;
 import org.apache.ibatis.annotations.Mapper;
