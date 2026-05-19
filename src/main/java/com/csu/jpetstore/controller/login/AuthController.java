@@ -88,7 +88,7 @@ public class AuthController {
 
     @GetMapping("/signOnCodeForm")
     public String showSignOnCodeForm() {
-        return "account/signonCode";
+        return "account/signon_code";
     }
 
     // ==================== 发送邮箱验证码 ====================
@@ -135,18 +135,18 @@ public class AuthController {
 
         if (sessionCode == null || !sessionCode.equals(code)) {
             model.addAttribute("errorMsg", "验证码错误或已过期");
-            return "account/signonCode";
+            return "account/signon_code";
         }
 
         if (sessionEmail == null || !sessionEmail.equals(email)) {
             model.addAttribute("errorMsg", "邮箱不匹配");
-            return "account/signonCode";
+            return "account/signon_code";
         }
 
         Account loginAccount = accountService.getAccountByEmail(email);
         if (loginAccount == null) {
             model.addAttribute("errorMsg", "用户不存在");
-            return "account/signonCode";
+            return "account/signon_code";
         }
 
         loginAccount.setPassword(null);

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 账户管理控制器 - 合并了注册、验证、资料修改等功能
  */
-@Controller
+@Controller("loginAccountController")
 @RequestMapping("/account")
 public class AccountController {
 

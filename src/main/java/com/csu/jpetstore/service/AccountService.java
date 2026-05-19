@@ -12,17 +12,19 @@ public class AccountService {
     @Autowired
     private AccountMapper accountMapper;
 
-    public Account getAccount(String username, String password) {
+    public Account login(String username, String password) {
         Account account = new Account();
         account.setUsername(username);
         account.setPassword(password);
         return accountMapper.getAccountByUsernameAndPassword(account);
     }
 
+    public Account getAccount(String username, String password) {
+        return login(username, password);
+    }
+
     @Transactional
     public void insertAccount(Account account) throws Exception {
-        System.out.println("开始注册用户: " + account.getUsername());
-
         Account existingUser = accountMapper.getAccountByUsername(account.getUsername());
         if (existingUser != null) {
             throw new Exception("用户名已存在");
@@ -36,12 +38,10 @@ public class AccountService {
         accountMapper.insertAccount(account);
         accountMapper.insertProfile(account);
         accountMapper.insertSignon(account);
-
-        System.out.println("用户注册成功: " + account.getUsername());
     }
 
     public Account getAccountByUsername(String username) {
-        if(username == null || username.isEmpty()) return null;
+        if (username == null || username.isEmpty()) return null;
         return accountMapper.getAccountByUsername(username);
     }
 
@@ -49,17 +49,22 @@ public class AccountService {
     public void updateAccount(Account account) throws Exception {
         accountMapper.updateAccount(account);
         accountMapper.updateProfile(account);
-        accountMapper.updateSignon(account);
     }
 
     public Account getAccountByEmail(String email) {
-        System.out.println("AccountService: 检查邮箱 " + email);
-        if (email == null || email.isEmpty()){
-            System.out.println("邮箱检查为空");
-            return null;
+        if (email == null || email.isEmpty()) return null;
+        return accountMapper.getAccountByEmail(email);
+    }
+
+    @Transactional
+    public void changePassword(String username, String oldPassword, String newPassword) throws Exception {
+        Account account = new Account();
+        account.setUsername(username);
+        account.setPassword(oldPassword);
+        Account existing = accountMapper.getAccountByUsernameAndPassword(account);
+        if (existing == null) {
+            throw new Exception("原密码错误");
         }
-        Account account = accountMapper.getAccountByEmail(email);
-        System.out.println("AccountService: 查询结果: " + account);
-        return account;
+        accountMapper.updatePassword(username, newPassword);
     }
 }

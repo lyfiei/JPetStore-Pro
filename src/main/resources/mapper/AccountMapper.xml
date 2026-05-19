@@ -59,7 +59,9 @@
 
     <!-- 3. 根据邮箱查询账户 -->
     <select id="getAccountByEmail" resultType="com.csu.jpetstore.domain.Account">
-        SELECT * FROM ACCOUNT WHERE EMAIL = #{email}
+        SELECT USERID AS username, EMAIL AS email, FIRSTNAME AS firstName, LASTNAME AS lastName,
+               STATUS, ADDR1 AS address1, ADDR2 AS address2, CITY, STATE, ZIP, COUNTRY, PHONE
+        FROM ACCOUNT WHERE EMAIL = #{email}
     </select>
 
     <!-- 4. 插入账户 -->
@@ -108,6 +110,16 @@
     <!-- 9. 更新 Signon -->
     <update id="updateSignon">
         UPDATE SIGNON SET PASSWORD=#{password} WHERE USERNAME=#{username}
+    </update>
+
+    <!-- 10. 根据用户名查询密码哈希 -->
+    <select id="getPasswordByUsername" resultType="string">
+        SELECT PASSWORD FROM SIGNON WHERE USERNAME = #{username}
+    </select>
+
+    <!-- 11. 更新密码 -->
+    <update id="updatePassword">
+        UPDATE SIGNON SET PASSWORD = #{password} WHERE USERNAME = #{username}
     </update>
 
 </mapper>

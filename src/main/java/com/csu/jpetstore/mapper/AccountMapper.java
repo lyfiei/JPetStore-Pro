@@ -2,6 +2,7 @@ package com.csu.jpetstore.mapper;
 
 import com.csu.jpetstore.domain.Account;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper  // 只加这一个注解！！！
 public interface AccountMapper {
@@ -16,5 +17,7 @@ public interface AccountMapper {
     void updateProfile(Account account);
     void updateSignon(Account account);
     Account getAccountByEmail(String email);
+    String getPasswordByUsername(String username);
+    void updatePassword(@Param("username") String username, @Param("password") String password);
 
 }

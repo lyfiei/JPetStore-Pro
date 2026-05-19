@@ -7,7 +7,7 @@
     <insert id="insertLog" parameterType="com.csu.jpetstore.domain.LogData">
         INSERT INTO log_data (session_id, user_id, action_type, target_type, target_id, details, create_time)
         VALUES (#{sessionId}, #{userId}, #{actionType}, #{targetType}, #{targetId}, 
-                #{details, typeHandler=org.apache.ibatis.type.JacksonTypeHandler}, NOW())
+                #{detailsJson}, NOW())
     </insert>
 
 </mapper>

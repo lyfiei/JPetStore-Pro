@@ -1,10 +1,8 @@
 package com.csu.jpetstore.controller;
 
 import com.csu.jpetstore.domain.Account;
-import com.csu.jpetstore.domain.Product;
 import com.csu.jpetstore.service.AccountService;
-import com.csu.jpetstore.service.CatalogService;
-import jakarta.servlet.http.HttpSession; // 注意：Spring Boot 3+ 使用 jakarta
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,56 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
-
 @Controller
 public class AccountController {
 
     @Autowired
     private AccountService accountService;
-
-    @Autowired
-    private CatalogService catalogService;
-
-    // 对应原来的 SignOnFormServlet (GET)
-    @GetMapping("/signOnForm")
-    public String signOnForm() {
-        // Thymeleaf 默认去 src/main/resources/templates/ 下找文件
-        // 返回 "account/signon" 会指向 templates/account/signon.html
-        return "account/signon";
-    }
-
-    // 对应原来的 SignOnServlet (POST)
-    @PostMapping("/signOn")
-    public String signOn(@RequestParam("username") String username,
-                         @RequestParam("password") String password,
-                         HttpSession session,
-                         Model model) {
-
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            model.addAttribute("signOnMsg", "用户名或密码不能为空");
-            return "account/signon";
-        }
-
-        Account loginAccount = accountService.getAccount(username, password);
-
-        if (loginAccount == null) {
-            System.out.println("登录失败：查询不到用户 " + username); // 临时调试
-            model.addAttribute("signOnMsg", "用户名或者密码错误");
-            return "account/signon";
-        } else {
-            loginAccount.setPassword(null);
-            session.setAttribute("loginAccount", loginAccount);
-
-            if (loginAccount.isListOption()) {
-                List<Product> myList = catalogService.getProductListByCategory(loginAccount.getFavouriteCategoryId());
-                session.setAttribute("myList", myList);
-            }
-            // 重定向到主页路由
-            return "redirect:/mainForm";
-        }
-    }
-
 
     // 对应 RegisterFormServlet (GET)
     @GetMapping("/registerForm")

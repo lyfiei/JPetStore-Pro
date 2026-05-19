@@ -29,17 +29,17 @@
 
         <ul class="nav-top-list">
             <li class="nav-top-item">
-                <a th:href="@{/cartForm}" class="link">
+                <a th:href="@{/cart/view}" class="link">
                     <i class="fa fa-shopping-cart"></i> Cart
                 </a>
             </li>
 
             <th:block th:if="${session.loginAccount != null}">
                 <li class="nav-top-item">
-                    <a th:href="@{/listOrders}" class="link">My Orders</a>
+                    <a th:href="@{/order/listOrders}" class="link">My Orders</a>
                 </li>
                 <li class="nav-top-item">
-                    <a th:href="@{/profileForm}" class="link">My Account</a>
+                    <a th:href="@{/account/profile}" class="link">My Account</a>
                 </li>
             </th:block>
 

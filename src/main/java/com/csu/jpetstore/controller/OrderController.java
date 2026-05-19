@@ -76,6 +76,17 @@ public class OrderController {
         target.setShipCountry(source.getShipCountry());
     }
 
+    @GetMapping("/listOrders")
+    public String listOrders(HttpSession session, Model model) {
+        Account account = (Account) session.getAttribute("loginAccount");
+        if (account == null) {
+            return "redirect:/signOnForm";
+        }
+        List<Order> orderList = orderService.getOrdersByUsername(account.getUsername());
+        model.addAttribute("orderList", orderList);
+        return "order/listOrders";
+    }
+
     @GetMapping("/viewOrder")
     public String viewOrder(@RequestParam int orderId, Model model) {
         Order order = orderService.getOrder(orderId);
