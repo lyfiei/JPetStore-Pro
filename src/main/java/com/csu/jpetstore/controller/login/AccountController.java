@@ -1,76 +1,53 @@
 package com.csu.jpetstore.controller.login;
 
 import com.csu.jpetstore.domain.Account;
-import com.csu.jpetstore.domain.Product;
 import com.csu.jpetstore.service.AccountService;
-import com.csu.jpetstore.service.CatalogService;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+/**
+ * 账户管理控制器 - 合并了注册、验证、资料修改等功能
+ */
 @Controller
+@RequestMapping("/account")
 public class AccountController {
 
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private CatalogService catalogService;
+    // ==================== 注册页面 ====================
 
-    // 对应原来的 SignOnFormServlet (GET)
-//    @GetMapping("/signOnForm")
-//    public String signOnForm() {
-//        // Thymeleaf 默认去 src/main/resources/templates/ 下找文件
-//        // 返回 "account/signon" 会指向 templates/account/signon.html
-//        return "account/signon";
-//    }
-
-    // 对应原来的 SignOnServlet (POST)
-//    @PostMapping("/signOn")
-//    public String signOn(@RequestParam("username") String username,
-//                         @RequestParam("password") String password,
-//                         HttpSession session,
-//                         Model model) {
-//
-//        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-//            model.addAttribute("signOnMsg", "用户名或密码不能为空");
-//            return "account/signon";
-//        }
-//
-//        Account loginAccount = accountService.getAccount(username, password);
-//
-//        if (loginAccount == null) {
-//            System.out.println("登录失败：查询不到用户 " + username); // 临时调试
-//            model.addAttribute("signOnMsg", "用户名或者密码错误");
-//            return "account/signon";
-//        } else {
-//            loginAccount.setPassword(null);
-//            session.setAttribute("loginAccount", loginAccount);
-//
-//            if (loginAccount.isListOption()) {
-//                List<Product> myList = catalogService.getProductListByCategory(loginAccount.getFavouriteCategoryId());
-//                session.setAttribute("myList", myList);
-//            }
-//            // 重定向到主页路由
-//            return "redirect:/mainForm";
-//        }
-//    }
-
-
-    // 对应 RegisterFormServlet (GET)
     @GetMapping("/registerForm")
-    public String registerForm() {
-        return "account/register"; // 跳转到 templates/account/register.html
+    public String showRegisterForm() {
+        return "account/register";
     }
 
-    // 对应 RegisterServlet (POST)
+    // ==================== 验证账号/邮箱（AJAX） ====================
+
+    @GetMapping("/validateAccount")
+    @ResponseBody
+    public String validateAccount(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email) {
+
+        if (username != null && !username.trim().isEmpty()) {
+            Account account = accountService.getAccountByUsername(username);
+            return account != null ? "exist" : "ok";
+        }
+
+        if (email != null && !email.trim().isEmpty()) {
+            Account account = accountService.getAccountByEmail(email);
+            return account != null ? "exist" : "ok";
+        }
+
+        return "ok";
+    }
+
+    // ==================== 注册提交 ====================
+
     @PostMapping("/register")
     public String register(Account account,
                            String confirmPassword,
@@ -104,21 +81,90 @@ public class AccountController {
         }
     }
 
-    // 处理注册页面的 AJAX 用户名/邮箱 重复校验
-//    @GetMapping("/validateAccount")
-//    @ResponseBody // 关键：直接返回数据，不跳转页面
-//    public String validateAccount(@RequestParam(value = "username", required = false) String username,
-//                                  @RequestParam(value = "email", required = false) String email) {
-//        if (username != null && !username.trim().isEmpty()) {
-//            // 假设你的 service 有这个方法，如果没有需要去 service 里写一个
-//            Account account = accountService.getAccountByUsername(username);
-//            return account != null ? "exist" : "ok";
-//        }
-//        if (email != null && !email.trim().isEmpty()) {
-//            // 校验邮箱同理
-//            Account account = accountService.getAccountByEmail(email);
-//            return account != null ? "exist" : "ok";
-//        }
-//        return "ok";
-//    }
+    // ==================== 个人资料页面 ====================
+
+    @GetMapping("/profile")
+    public String profile(HttpSession session, Model model) {
+        Account loginAccount = (Account) session.getAttribute("loginAccount");
+
+        if (loginAccount == null) {
+            return "redirect:/signOnForm";
+        }
+
+        Account account = accountService.getAccountByUsername(loginAccount.getUsername());
+        model.addAttribute("account", account);
+
+        return "account/profile";
+    }
+
+    // ==================== 更新个人资料 ====================
+
+    @PostMapping("/updateProfile")
+    @ResponseBody
+    public String updateProfile(
+            @RequestParam(value = "firstName", required = false) String firstName,
+            @RequestParam(value = "lastName", required = false) String lastName,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "address1", required = false) String address1,
+            @RequestParam(value = "address2", required = false) String address2,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "state", required = false) String state,
+            @RequestParam(value = "zip", required = false) String zip,
+            @RequestParam(value = "country", required = false) String country,
+            @RequestParam(value = "languagePreference", required = false) String languagePreference,
+            @RequestParam(value = "favouriteCategoryId", required = false) String favouriteCategoryId,
+            @RequestParam(value = "listOption", required = false) String listOption,
+            @RequestParam(value = "bannerOption", required = false) String bannerOption,
+            HttpSession session) {
+
+        Account account = (Account) session.getAttribute("loginAccount");
+
+        if (account == null) {
+            return "session_expired";
+        }
+
+        String errorMsg = null;
+        if (firstName == null || firstName.trim().isEmpty()) {
+            errorMsg = "名字不能为空";
+        } else if (lastName == null || lastName.trim().isEmpty()) {
+            errorMsg = "姓氏不能为空";
+        } else if (email == null || email.trim().isEmpty()) {
+            errorMsg = "邮箱不能为空";
+        }
+
+        if (errorMsg == null) {
+            Account existingAccount = accountService.getAccountByEmail(email);
+            if (existingAccount != null && !existingAccount.getUsername().equals(account.getUsername())) {
+                errorMsg = "该邮箱已被其他用户使用，请更换邮箱";
+            }
+        }
+
+        if (errorMsg != null) {
+            return errorMsg;
+        }
+
+        account.setFirstName(firstName);
+        account.setLastName(lastName);
+        account.setEmail(email);
+        account.setPhone(phone);
+        account.setAddress1(address1);
+        account.setAddress2(address2);
+        account.setCity(city);
+        account.setState(state);
+        account.setZip(zip);
+        account.setCountry(country);
+        account.setLanguagePreference(languagePreference);
+        account.setFavouriteCategoryId(favouriteCategoryId);
+        account.setListOption("on".equals(listOption) || "true".equals(listOption));
+        account.setBannerOption("on".equals(bannerOption) || "true".equals(bannerOption));
+
+        try {
+            accountService.updateAccount(account);
+            session.setAttribute("loginAccount", account);
+            return "success";
+        } catch (Exception e) {
+            return "数据库更新失败：" + e.getMessage();
+        }
+    }
 }

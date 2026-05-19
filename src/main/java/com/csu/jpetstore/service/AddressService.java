@@ -1,23 +1,27 @@
 package com.csu.jpetstore.service;
 
 import com.csu.jpetstore.domain.Address;
-import com.csu.jpetstore.persistence.AddressDao;
-import com.csu.jpetstore.persistence.impl.AddressDaoImpl;
+import com.csu.jpetstore.mapper.AddressMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class AddressService {
-    private AddressDao addressDao = new AddressDaoImpl();
+    
+    @Autowired
+    private AddressMapper addressMapper;
 
     public void addAddress(Address address) {
-        addressDao.insertAddress(address);
+        addressMapper.insertAddress(address);
     }
 
     public List<Address> getAddressListByUsername(String username) {
-        return addressDao.getAddressListByUsername(username);
+        return addressMapper.getAddressListByUsername(username);
     }
 
     public Address getAddressById(int addressId) { // ✅ 新增
-        return addressDao.getAddressById(addressId);
+        return addressMapper.getAddressById(addressId);
     }
 }

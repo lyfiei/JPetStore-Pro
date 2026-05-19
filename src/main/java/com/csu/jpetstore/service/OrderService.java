@@ -1,7 +1,7 @@
 package com.csu.jpetstore.service;
 
 import com.csu.jpetstore.domain.*;
-import com.csu.jpetstore.persistence.OrderMapper;
+import com.csu.jpetstore.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

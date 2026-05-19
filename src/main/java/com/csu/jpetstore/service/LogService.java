@@ -1,24 +1,22 @@
 package com.csu.jpetstore.service;
 
 import com.csu.jpetstore.domain.LogData;
-import com.csu.jpetstore.persistence.LogDao;
-import com.csu.jpetstore.persistence.impl.LogDaoImpl;
-import org.springframework.stereotype.Service;  // 👈 加这一行
+import com.csu.jpetstore.mapper.LogMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Service  // 👈 只加这一个注解！！！
+@Service
 public class LogService {
 
-    private final LogDao logDao;
+    @Autowired
+    private LogMapper logMapper;
+    
     private static final ExecutorService logExecutor =
             Executors.newFixedThreadPool(5, r -> new Thread(r, "Log-Writer-Thread"));
-
-    public LogService() {
-        this.logDao = new LogDaoImpl();
-    }
 
     // ======================================
     // 👇 下面她写的所有代码 100% 完全不动！
@@ -39,7 +37,7 @@ public class LogService {
             System.err.println("Log Error: Missing required fields: " + logData);
             return false;
         }
-        return logDao.insertLog(logData);
+        return logMapper.insertLog(logData);
     }
 
     public void logAddToCart(String sessionId, String userId, String itemId, int quantity) {

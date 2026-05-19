@@ -1,9 +1,11 @@
 package com.csu.jpetstore.service;
 
+import org.springframework.stereotype.Service;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.util.Properties;
 
+@Service
 public class EmailService {
     private static final String FROM_EMAIL = "2473108081@qq.com"; // 你的邮箱
     private static final String AUTH_CODE = "sjwtiogcrjegdiba";    // 邮箱授权码

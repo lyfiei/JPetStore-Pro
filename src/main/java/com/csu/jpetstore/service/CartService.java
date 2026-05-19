@@ -16,6 +16,7 @@ public class CartService {
     @Autowired
     private CartMapper cartMapper;
 
+    @Autowired
     private CatalogService catalogService;
 
     public List<CartItem> getCartItemsByUserId(String userId){
@@ -28,7 +29,6 @@ public class CartService {
 
     @Transactional
     public void addCartItem(Cart cart, String workingItemId, String userId){
-        catalogService = new CatalogService();
         Item item = catalogService.getItem(workingItemId);
 
         CartItem cartItem = cart.addItem(item, catalogService.isItemInStock(item.getItemId()));

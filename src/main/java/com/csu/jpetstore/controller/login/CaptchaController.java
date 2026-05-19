@@ -11,15 +11,36 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 import javax.imageio.ImageIO;
 
+/**
+ * 验证码控制器 - 合并了所有验证码生成功能
+ */
 @Controller
 public class CaptchaController {
+
     private static final int WIDTH = 100;
     private static final int HEIGHT = 40;
 
+    /**
+     * 通用验证码生成（用于登录）
+     */
     @GetMapping("/captcha")
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    protected void generateCaptcha(HttpServletRequest req, HttpServletResponse resp) {
+        generateCaptchaImage(req, resp);
+    }
+
+    /**
+     * 注册专用验证码
+     */
+    @GetMapping("/captchaForRegister")
+    protected void generateCaptchaForRegister(HttpServletRequest req, HttpServletResponse resp) {
+        generateCaptchaImage(req, resp);
+    }
+
+    /**
+     * 统一的验证码生成逻辑
+     */
+    private void generateCaptchaImage(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            // 创建图片缓冲区
             BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
             Graphics g = image.getGraphics();
 
@@ -45,7 +66,7 @@ public class CaptchaController {
             g.setFont(new Font("Arial", Font.BOLD, 22));
             for (int i = 0; i < 4; i++) {
                 g.setColor(new Color(r.nextInt(200), r.nextInt(100), r.nextInt(200)));
-                g.drawString(String.valueOf(code.charAt(i)), 20 * i + 10, 25);
+                g.drawString(String.valueOf(code.charAt(i)), 20 * i + 10, 28);
             }
 
             // 加干扰线
@@ -58,6 +79,10 @@ public class CaptchaController {
 
             // 输出到浏览器
             resp.setContentType("image/jpeg");
+            resp.setHeader("Pragma", "No-cache");
+            resp.setHeader("Cache-Control", "no-cache");
+            resp.setDateHeader("Expires", 0);
+            
             ImageIO.write(image, "jpeg", resp.getOutputStream());
 
         } catch (Exception e) {
