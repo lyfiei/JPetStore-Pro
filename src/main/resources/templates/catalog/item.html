@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品详情</title>
+    <link rel="StyleSheet" th:href="@{/css/mypetstore.css}" type="text/css" />
+</head>
+<body>
+<div th:replace="~{common/top :: top}"></div>
+
+<div id="BackLink">
+    <a th:if="${session.lastSearchUrl != null}"
+       th:href="@{ '/' + ${session.lastSearchUrl} }">Return to Search Results</a>
+
+    <a th:unless="${session.lastSearchUrl != null}"
+       th:href="@{/catalog/product(productId=${product.productId})}"
+       th:text="'Return to ' + ${product.productId}">Return to Product</a>
+</div>
+
+<div id="Catalog">
+    <table>
+        <tr>
+            <td th:text="${product.description}">商品描述</td>
+        </tr>
+        <tr>
+            <td><b th:text="${item.itemId}">商品项ID</b></td>
+        </tr>
+        <tr>
+            <td>
+                <b>
+                    <span style="font-size: large;">
+                        [[${item.attribute1}]] [[${item.attribute2}]] [[${item.attribute3}]]
+                        [[${item.attribute4}]] [[${item.attribute5}]] [[${product.name}]]
+                    </span>
+                </b>
+            </td>
+        </tr>
+        <tr>
+            <td th:text="${product.name}">商品名称</td>
+        </tr>
+        <tr>
+            <td th:if="${item.quantity <= 0}">Back ordered.</td>
+            <td th:if="${item.quantity > 0}" th:text="${item.quantity + ' in stock.'}">库存数量</td>
+        </tr>
+        <tr>
+            <td th:text="${#numbers.formatCurrency(item.listPrice)}">$0.00</td>
+        </tr>
+        <tr>
+            <td>
+                <form th:action="@{/addItemToCart}" method="post">
+                    <input type="hidden" name="workingItemId" th:value="${item.itemId}">
+                    <button type="submit" class="Button">Add to Cart</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div th:replace="~{common/bottom :: bottom}"></div>
+</body>
+</html>

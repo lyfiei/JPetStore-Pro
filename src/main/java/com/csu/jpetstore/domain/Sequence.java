@@ -1,6 +1,8 @@
+// \src\main\java\com\csu\jpetstore\domain\Sequence.java
 package com.csu.jpetstore.domain;
 
 import java.io.Serializable;
+
 
 public class Sequence implements Serializable {
     private static final long serialVersionUID = 8278780133180137281L;

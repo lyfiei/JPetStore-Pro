@@ -1,6 +1,7 @@
 package com.csu.jpetstore.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Product implements Serializable {
     private static final long serialVersionUID = -7492639752670189553L;
@@ -8,6 +9,7 @@ public class Product implements Serializable {
     private String categoryId;
     private String name;
     private String description;
+    private List<Item> itemList;
 
     public String getProductId() {
         return productId;
@@ -44,5 +46,8 @@ public class Product implements Serializable {
     public String toString() {
         return getName();
     }
+
+    public List<Item> getItemList() { return itemList; }
+    public void setItemList(List<Item> itemList) { this.itemList = itemList; }
 
 }

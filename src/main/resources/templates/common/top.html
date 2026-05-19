@@ -8,6 +8,7 @@
     <script src="https://kit.fontawesome.com/59c20db7cc.js" crossorigin="anonymous"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script th:src="@{/js/search.js}"></script>
+    <script th:src="@{/js/productAuto.js}"></script>
 </head>
 
 <body th:fragment="top">
@@ -43,7 +44,7 @@
             </th:block>
 
             <li class="nav-top-item">
-                <a th:href="@{/help.html}" class="link">?</a>
+                <a th:href="@{/templates/help.html}" class="link">?</a>
             </li>
         </ul>
     </div>
@@ -52,15 +53,15 @@
 <div class="nav-search">
     <div class="w">
         <div id="logo">
-            <a th:href="@{/mainForm}"><img th:src="@{/images/logo-topbar.gif}" /></a>
+            <a th:href="@{/catalog/main}"><img th:src="@{/images/logo-topbar.gif}" /></a>
         </div>
         <div class="search-content">
             <div id="Search">
                 <div id="SearchContent">
                     <div class="search-wrapper">
-                        <form th:action="@{/search}" method="post" onsubmit="return checkSearch();">
+                        <form th:action="@{/catalog/search}" method="post" onsubmit="return checkSearch();">
                             <input type="text" name="keyword" size="14" id="keyword" class="search-input" />
-                            <button type="submit" class="btn search-btn">搜索</button>
+                            <button type="submit" class="btn search-btn">Search</button>
                         </form>
                         <div id="productAutoComplete">
                             <ul id="productAutoList">
@@ -76,12 +77,33 @@
 <div class="crumb">
     <div class="w">
         <div id="QuickLinks">
-            <a th:href="@{/categoryForm(categoryId='FISH')}" onmouseover="showCategory(this, 'FISH')" onmouseout="hideCategory()">
+            <a th:href="@{/catalog/category(categoryId='FISH')}"
+               onmouseover="showCategory(this, 'FISH')" onmouseout="hideCategory()">
                 <img th:src="@{/images/sm_fish.gif}" />
             </a>
             <img th:src="@{/images/separator.gif}" />
-            <a th:href="@{/categoryForm(categoryId='DOGS')}" onmouseover="showCategory(this, 'DOGS')" onmouseout="hideCategory()">
+
+            <a th:href="@{/catalog/category(categoryId='DOGS')}"
+               onmouseover="showCategory(this, 'DOGS')" onmouseout="hideCategory()">
                 <img th:src="@{/images/sm_dogs.gif}" />
+            </a>
+            <img th:src="@{/images/separator.gif}" />
+
+            <a th:href="@{/catalog/category(categoryId='REPTILES')}"
+               onmouseover="showCategory(this, 'REPTILES')" onmouseout="hideCategory()">
+                <img th:src="@{/images/sm_reptiles.gif}" />
+            </a>
+            <img th:src="@{/images/separator.gif}" />
+
+            <a th:href="@{/catalog/category(categoryId='CATS')}"
+               onmouseover="showCategory(this, 'CATS')" onmouseout="hideCategory()">
+                <img th:src="@{/images/sm_cats.gif}" />
+            </a>
+            <img th:src="@{/images/separator.gif}" />
+
+            <a th:href="@{/catalog/category(categoryId='BIRDS')}"
+               onmouseover="showCategory(this, 'BIRDS')" onmouseout="hideCategory()">
+                <img th:src="@{/images/sm_birds.gif}" />
             </a>
         </div>
     </div>
@@ -100,3 +122,5 @@
              style="background-color:#e6ffe6; color:#006600; font-weight:bold; padding:8px; border-radius:6px; margin:10px 0; text-align:center;"
              th:text="${session.updateMsg}">
         </div>
+    </div>
+</div>

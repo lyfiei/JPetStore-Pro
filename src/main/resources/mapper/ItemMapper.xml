@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.csu.jpetstore.mapper.ItemMapper">
+
+    <resultMap id="itemResultMap" type="com.csu.jpetstore.domain.Item">
+        <id property="itemId" column="ITEMID"/>
+        <result property="listPrice" column="LISTPRICE"/>
+        <result property="unitCost" column="UNITCOST"/>
+        <result property="supplierId" column="supplierId"/>
+        <result property="status" column="STATUS"/>
+        <result property="attribute1" column="attribute1"/>
+        <result property="attribute2" column="attribute2"/>
+        <result property="attribute3" column="attribute3"/>
+        <result property="attribute4" column="attribute4"/>
+        <result property="attribute5" column="attribute5"/>
+        <result property="quantity" column="quantity"/>
+        <association property="product" javaType="com.csu.jpetstore.domain.Product">
+            <id property="productId" column="product_productId"/>
+            <result property="name" column="product_name"/>
+            <result property="description" column="product_description"/>
+            <result property="categoryId" column="product_categoryId"/>
+        </association>
+    </resultMap>
+
+    <select id="getItemListByProduct" parameterType="string" resultMap="itemResultMap">
+        SELECT
+            I.ITEMID, LISTPRICE, UNITCOST, SUPPLIER AS supplierId,
+            I.PRODUCTID AS product_productId, NAME AS product_name,
+            DESCN AS product_description, CATEGORY AS product_categoryId,
+            STATUS, ATTR1 AS attribute1, ATTR2 AS attribute2, ATTR3 AS attribute3,
+            ATTR4 AS attribute4, ATTR5 AS attribute5
+        FROM ITEM I, PRODUCT P
+        WHERE P.PRODUCTID = I.PRODUCTID AND I.PRODUCTID = #{productId}
+    </select>
+
+    <select id="getItem" parameterType="string" resultMap="itemResultMap">
+        SELECT
+            I.ITEMID, LISTPRICE, UNITCOST, SUPPLIER AS supplierId,
+            I.PRODUCTID AS product_productId, NAME AS product_name,
+            DESCN AS product_description, CATEGORY AS product_categoryId,
+            STATUS, ATTR1 AS attribute1, ATTR2 AS attribute2, ATTR3 AS attribute3,
+            ATTR4 AS attribute4, ATTR5 AS attribute5,
+            QTY AS quantity
+        FROM ITEM I, INVENTORY V, PRODUCT P
+        WHERE P.PRODUCTID = I.PRODUCTID
+          AND I.ITEMID = V.ITEMID
+          AND I.ITEMID = #{itemId}
+    </select>
+
+    <select id="getInventoryQuantity" parameterType="string" resultType="int">
+        SELECT QTY FROM INVENTORY WHERE ITEMID = #{itemId}
+    </select>
+
+    <update id="updateInventoryQuantity" parameterType="map">
+        UPDATE INVENTORY
+        SET QTY = QTY - #{increment}
+        WHERE ITEMID = #{itemId}
+    </update>
+
+</mapper>

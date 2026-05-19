@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.csu.jpetstore.mapper.ProductMapper">
+
+    <resultMap id="productWithItemsResultMap" type="com.csu.jpetstore.domain.Product">
+        <id property="productId" column="productId" />
+        <result property="name" column="NAME" />
+        <result property="description" column="description" />
+        <result property="categoryId" column="categoryId" />
+
+        <collection property="itemList" ofType="com.csu.jpetstore.domain.Item">
+            <id property="itemId" column="itemId" />
+            <result property="listPrice" column="listPrice" />
+            <result property="attribute1" column="attribute1" />
+        </collection>
+    </resultMap>
+
+    <select id="getProductListWithItemsByCategory" parameterType="string" resultMap="productWithItemsResultMap">
+        SELECT
+            P.PRODUCTID as productId,
+            P.NAME,
+            P.DESCN as description,
+            P.CATEGORY as categoryId,
+            I.ITEMID as itemId,
+            I.LISTPRICE as listPrice,
+            I.ATTR1 as attribute1
+        FROM PRODUCT P
+                 LEFT JOIN ITEM I ON P.PRODUCTID = I.PRODUCTID
+        WHERE P.CATEGORY = #{categoryId}
+    </select>
+
+    <select id="getProductListByCategory" parameterType="string" resultType="com.csu.jpetstore.domain.Product">
+        SELECT
+            PRODUCTID as productId,
+            NAME,
+            DESCN as description,
+            CATEGORY as categoryId
+        FROM PRODUCT
+        WHERE CATEGORY = #{categoryId}
+    </select>
+
+    <select id="getProduct" parameterType="string" resultType="com.csu.jpetstore.domain.Product">
+        SELECT
+            PRODUCTID as productId,
+            NAME,
+            DESCN as description,
+            CATEGORY as categoryId
+        FROM PRODUCT
+        WHERE PRODUCTID = #{productId}
+    </select>
+
+    <select id="searchProductList" parameterType="string" resultType="com.csu.jpetstore.domain.Product">
+        SELECT DISTINCT
+            P.PRODUCTID as productId,
+            P.NAME,
+            P.DESCN AS description,
+            P.CATEGORY AS categoryId
+        FROM PRODUCT P
+                 JOIN CATEGORY C ON P.CATEGORY = C.CATID
+                 LEFT JOIN ITEM I ON P.PRODUCTID = I.PRODUCTID
+        WHERE LOWER(P.NAME) LIKE CONCAT('%', #{keyword}, '%')
+           OR LOWER(P.DESCN) LIKE CONCAT('%', #{keyword}, '%')
+           OR LOWER(C.NAME) LIKE CONCAT('%', #{keyword}, '%')
+           OR LOWER(C.DESCN) LIKE CONCAT('%', #{keyword}, '%')
+           OR LOWER(I.ATTR1) LIKE CONCAT('%', #{keyword}, '%')
+           OR LOWER(I.ATTR2) LIKE CONCAT('%', #{keyword}, '%')
+           OR LOWER(I.ATTR3) LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY P.PRODUCTID
+    </select>
+
+</mapper>

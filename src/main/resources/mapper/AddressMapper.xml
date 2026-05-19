@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.csu.jpetstore.mapper.AddressMapper">
+
+    <resultMap id="addressResultMap" type="Address">
+        <id property="addressId" column="address_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="phone" column="phone"/>
+        <result property="address1" column="address1"/>
+        <result property="address2" column="address2"/>
+        <result property="city" column="city"/>
+        <result property="state" column="state"/>
+        <result property="zip" column="zip"/>
+        <result property="country" column="country"/>
+        <result property="isDefault" column="is_default"/>
+    </resultMap>
+
+    <select id="getAddressListByUsername" resultMap="addressResultMap">
+        SELECT * FROM address WHERE user_id = #{username} ORDER BY is_default DESC, address_id DESC
+    </select>
+
+    <select id="getAddressById" resultMap="addressResultMap">
+        SELECT * FROM address WHERE address_id = #{addressId}
+    </select>
+
+    <insert id="insertAddress" parameterType="Address" useGeneratedKeys="true" keyProperty="addressId">
+        INSERT INTO address (user_id, first_name, last_name, phone, address1, address2,
+                            city, state, zip, country, is_default)
+        VALUES (#{userId}, #{firstName}, #{lastName}, #{phone}, #{address1}, #{address2},
+                #{city}, #{state}, #{zip}, #{country}, #{isDefault})
+    </insert>
+
+</mapper>

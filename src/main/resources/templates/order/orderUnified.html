@@ -1,0 +1,476 @@
+<!-- templates/order/orderUnified.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Order</title>
+    <link rel="StyleSheet" th:href="@{/css/mypetstore.css}" type="text/css" media="screen" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<header th:replace="common/top"></header>
+<div id="Content">
+    <div class="w w1">
+
+        <style>
+            /* 样式：控制步骤显示和进度条 */
+            .step-container { display: none; background: #fff; padding: 20px; border-radius: 8px; }
+            .step-container.active { display: block; }
+            .checkout-steps { display: flex; justify-content: space-around; margin-bottom: 30px; background: #f8f9fa; padding: 15px; }
+            .checkout-steps div { color: #999; font-weight: bold; }
+            .checkout-steps div.active { color: #eaac00; border-bottom: 2px solid #eaac00; }
+            .btn-group { margin-top: 20px; text-align: center; }
+            .Button { cursor: pointer; padding: 5px 20px; }
+            .Button-right{
+                padding: 7px 20px;
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                cursor: pointer;
+                background-color: #FFC107;
+                color: black;
+                border: 1px solid #CCCCCC;
+                border-radius: 4px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.1);}
+            .Button-right:hover {
+                background-color: #eaac00;
+            }
+        </style>
+
+        <div id="Catalog">
+            <div class="checkout-steps">
+                <div id="nav-1" class="active">Confirm Items</div>
+                <div id="nav-2">Payment Method(s)</div>
+                <div id="nav-3"> Fill in Address</div>
+                <div id="nav-4">Preview and Submit</div>
+            </div>
+
+            <div id="step-1" class="step-container active">
+                <h2>Checkout Summary</h2>
+                <table>
+
+                    <tr>
+                        <td><b>Item ID</b></td>
+                        <td><b>Product ID</b></td>
+                        <td><b>Description</b></td>
+                        <td><b>In Stock?</b></td>
+                        <td><b>Quantity</b></td>
+                        <td><b>List Price</b></td>
+                        <td><b>Total Cost</b></td>
+                    </tr>
+
+                    <!--                    <c:forEach var="cartItem" items="${sessionScope.cart.cartItems}">-->
+                    <tr th:each="cartItem : ${cart.cartItems}">
+                        <td>
+                            <!--                            <a href="itemForm?itemId=${cartItem.item.itemId}">${cartItem.item.itemId}</a>-->
+                            <a th:href="'/cart/viewItem?itemId='+${cartItem.item.itemId}" th:text="${cartItem.item.itemId}"></a>
+                        </td>
+                        <td th:text="${cartItem.item.productId}"></td>
+                        <td th:text="${cartItem.item.attributes}+' '+${cartItem.item.productName}"> Item Description </td>
+                        <td>
+                            <!--                            <c:choose>-->
+                            <!--                                <c:when test="${cartItem.inStock}">Yes</c:when>-->
+                            <!--                                <c:otherwise>No</c:otherwise>-->
+                            <!--                            </c:choose>-->
+                            <span th:text="${cartItem.inStock} ? 'Yes' : 'No'"></span>
+                        </td>
+                        <td th:text="${cartItem.quantity}"></td>
+                        <!--                        <td><fmt:formatNumber value="${cartItem.item.listPrice}" pattern="$#,##0.00" /></td>-->
+                        <!--                        <td><fmt:formatNumber value="${cartItem.total}" pattern="$#,##0.00" /></td>-->
+                        <td th:text="'$'+${#numbers.formatDecimal(cartItem.item.listPrice,1,2)}">Item List Price</td>
+                        <td th:text="'$'+${#numbers.formatDecimal(cartItem.total,1,2)}">Item Total</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7">Sub Total:
+                            <!--                            <fmt:formatNumber value="${sessionScope.cart.subTotal}" pattern="$#,##0.00" />-->
+                            <span th:text="'$'+${#numbers.formatDecimal(cart.subTotal,1,2)}"></span>
+                        </td>
+                    </tr>
+                </table>
+                <div class="btn-group">
+                    <!--                    <button class="Button" onclick="cartForm">Return to Shopping Cart</button>-->
+                    <button class="Button" th:onclick="|window.location.href='/cart/viewCart'|">Return to Shopping Cart</button> <!--外层的 |...| 是Thymeleaf 的 字面量替换 (Literal Substitution)。它把字符串和变量混合在一起，省去了用 + 号拼接的麻烦-->
+                    <button class="Button-right" onclick="changeStep(2)">Next Step: Select Payment Method</button>
+                </div>
+            </div>
+
+            <div id="step-2" class="step-container">
+                <h2>Payment Method</h2>
+                <div style="text-align: center;">
+                    <img id="payQR" th:src="@{/images/alipayPayImg.jpg}" ...>
+                    <br><br>
+
+                    <label>
+                        <input type="radio" name="payMethod" checked onclick="switchPay('alipay')"> Alipay
+                    </label>
+                    <label>
+                        <input type="radio" name="payMethod" onclick="switchPay('wechat')"> WeChat
+                    </label>
+                </div>
+
+                <div class="btn-group">
+                    <button class="Button" onclick="changeStep(1)">Previous Step</button>
+                    <button class="Button-right" onclick="changeStep(3)"> I Have Paid, Fill in Address</button>
+                </div>
+            </div>
+
+            <script th:inline="javascript"> <!-- Thymeleaf 的 脚本行内模式: th:inline="javascript"：告诉 Thymeleaf 引擎"这段代码里可能有我的表达式，请帮我解析它们" -->
+            function switchPay(method) {
+                const qrImage = document.getElementById('payQR');
+
+                if (method === 'alipay') {
+                    qrImage.src = '../images/alipayPayImg.jpg';
+                } else if (method === 'wechat') {
+                    qrImage.src = '../images/WeChatPayImg.jpg';
+                }
+            }
+            </script>
+
+            <div id="step-3" class="step-container">
+                <form id="combinedAddressForm">
+                    <input type="hidden" name="action" value="saveInfo">
+                    <h3>Payment & Billing Address</h3>
+                    <!--                    <%-->
+                    <!--                    Account account = (Account) session.getAttribute("loginAccount");-->
+                    <!--                    %>-->
+                    <table th:with="account=${session.account}">    <!-- Thymeleaf 的 局部变量定义 语法:在当前标签（<table>）及其所有子标签范围内，定义一个名叫 account 的变量 -->
+                        <tr>
+                            <th colspan=2>Payment Details</th>
+                        </tr>
+                        <tr>
+                            <td>Card Type:</td>
+                            <td>
+                                <label>
+                                    <select name="cardType">
+                                        <option value="Visa">Visa</option>
+                                        <option value="Mastercard">Mastercard</option>
+                                        <option value="AmericanExpress">American Express</option>
+                                    </select>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Card Number:</td>
+                            <td>
+                                <!--                                <input type="text" name="Number" value="<%= account != null ? account.getPhone():"" %>"/>-->
+                                <input type="text" name="Number" th:value="${account != null ? account.phone : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Order Date (MM/YYYY):</td>
+                            <td>
+                                <input type="text" th:value="${session.order != null ? #dates.format(session.order.orderDate, 'yyyy/MM/dd HH:mm:ss') : #dates.format(#dates.createNow(), 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Expiry Date (MM/YYYY):</td>
+                            <td>
+                                <input type="text" th:value="${#dates.format(expiryDate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th colspan=2>Billing Address</th>
+                        </tr>
+
+                        <tr>
+                            <td>First name:</td>
+                            <td>
+                                <!--                                <input type="text" name="FirstName" value="<%= account != null ? account.getFirstName() : "" %>"/>-->
+                                <input type="text" name="billToFirstName" th:value="${account != null ? account.firstName : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Last name:</td>
+                            <td>
+                                <!--                                <input type="text" name="LastName" value="<%= account != null ? account.getLastName() : "" %>"/>-->
+                                <input type="text" name="billToLastName" th:value="${account != null ? account.lastName : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Address 1:</td>
+                            <td>
+                                <!--                                <input type="text" size="40" name="Address1" value="<%= account != null ? account.getAddress1() : "" %>"/>-->
+                                <input type="text" size="40" name="billAddress1" th:value="${account != null ? account.address1 : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Address 2:</td>
+                            <td>
+                                <!--                                <input type="text" size="40" name="Address2" value="<%= account != null ? account.getAddress2() : "" %>"/>-->
+                                <input type="text" size="40" name="billAddress2" th:value="${account != null ? account.address2 : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>City:</td>
+                            <td>
+                                <!--                                <input type="text" name="City" value="<%= account != null ? account.getCity() : "" %>"/>-->
+                                <input type="text" name="billCity" th:value="${account != null ? account.city : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>State:</td>
+                            <td>
+                                <!--                                <input type="text" size="4" name="State" value="<%= account != null ? account.getState() : "" %>"/>-->
+                                <input type="text" size="4" name="billState" th:value="${account != null ? account.state : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Zip:</td>
+                            <td>
+                                <!--                                <input type="text" size="10" name="Zip" value="<%= account != null ? account.getZip() : "" %>"/>-->
+                                <input type="text" size="10" name="billZip" th:value="${account != null ? account.zip : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Country:</td>
+                            <td>
+                                <!--                                <input type="text" size="15" name="Country" value="<%= account != null ? account.getCountry() : "" %>"/>-->
+                                <input type="text" size="15" name="billCountry" th:value="${account != null ? account.country : ''}"/>
+                            </td>
+                        </tr>
+
+                        <!--                        <%&#45;&#45;        <tr>&#45;&#45;%>-->
+                        <!--                        <%&#45;&#45;            <td colspan=2>&#45;&#45;%>-->
+                        <!--                            <%&#45;&#45;                <input type="checkbox" name="shippingAddressRequired" />&#45;&#45;%>-->
+                        <!--                            <%&#45;&#45;                Ship to different address...&#45;&#45;%>-->
+                        <!--                            <%&#45;&#45;            </td>&#45;&#45;%>-->
+                        <!--                        <%&#45;&#45;        </tr>&#45;&#45;%>-->
+
+                    </table>
+
+                    <h3>Shipping Address</h3>
+                    <table th:with="account=${session.account}">
+                        <tr>
+                            <th colspan="2">Shipping Address</th>
+                        </tr>
+
+                        <tr>
+                            <td>First name:</td>
+                            <td>
+                                <!--                                <input type="text" name="shipToFirstName" value="<%= account != null ? account.getFirstName() : "" %>"/>-->
+                                <input type="text" name="shipToFirstName" th:value="${account != null ? account.firstName : ''}"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Last name:</td>
+                            <td>
+                                <!--                                <input type="text" name="shipToLastName" value="<%= account != null ? account.getLastName() : "" %>"/>-->
+                                <input type="text" name="shipToLastName" th:value="${account != null ? account.lastName : ''}"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Address 1:</td>
+                            <td>
+                                <!--                                <input type="text" size="40" name="shipAddress1" value="<%= account != null ? account.getAddress1() : "" %>"/>-->
+                                <input type="text" size="40" name="shipAddress1" th:value="${account != null ? account.address1 : ''}"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Address 2:</td>
+                            <td>
+                                <!--                                <input type="text" size="40" name="shipAddress2" value="<%= account != null ? account.getAddress2() : "" %>"/>-->
+                                <input type="text" size="40" name="shipAddress2" th:value="${account != null ? account.address2 : ''}"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>City:</td>
+                            <td>
+                                <!--                                <input type="text" name="shipCity" value="<%= account != null ? account.getCity() : "" %>"/>-->
+                                <input type="text" name="shipCity" th:value="${account != null ? account.city : ''}"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>State:</td>
+                            <td>
+                                <!--                                <input type="text" size="4" name="shipState" value="<%= account != null ? account.getState() : "" %>"/>-->
+                                <input type="text" size="4" name="shipState" th:value="${account != null ? account.state : ''}"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Zip:</td>
+                            <td>
+                                <!--                                <input type="text" size="10" name="shipZip" value="<%= account != null ? account.getZip() : "" %>"/>-->
+                                <input type="text" size="10" name="shipZip" th:value="${account != null ? account.zip : ''}"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Country:</td>
+                            <td>
+                                <!--                                <input type="text" size="15" name="shipCountry" value="<%= account != null ? account.getCountry() : "" %>"/>-->
+                                <input type="text" size="15" name="shipCountry" th:value="${account != null ? account.country : ''}"/>
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </form>
+                <div class="btn-group">
+                    <button class="Button" onclick="changeStep(2)">Previous Step</button>
+                    <button class="Button-right" onclick="ajaxSaveInfo()">Save and Preview Order</button>
+                </div>
+            </div>
+
+            <div id="step-4" class="step-container">
+                <h2>Please Confirm Your Information</h2>
+                <table id="previewTable">
+                    <tr>
+                        <th align="center" colspan="2">
+                            <font size="4"><b>Order</b></font><br/>
+                            <font size="3">
+                                <b id="confirm_order_date"></b>
+                            </font>
+                        </th>
+                    </tr>
+
+                    <tr><th colspan="2">Billing Address</th></tr>
+                    <tr><td>First name:</td><td id="confirm_b_fname"></td></tr>
+                    <tr><td>Last name:</td><td id="confirm_b_lname"></td></tr>
+                    <tr><td>Address 1:</td><td id="confirm_b_addr1"></td></tr>
+                    <tr><td>Address 2:</td><td id="confirm_b_addr2"></td></tr>
+                    <tr><td>City:</td><td id="confirm_b_city"></td></tr>
+                    <tr><td>State:</td><td id="confirm_b_state"></td></tr>
+                    <tr><td>Zip:</td><td id="confirm_b_zip"></td></tr>
+                    <tr><td>Country:</td><td id="confirm_b_country"></td></tr>
+
+                    <tr><th colspan="2">Shipping Address</th></tr>
+                    <tr><td>First name:</td><td id="confirm_s_fname"></td></tr>
+                    <tr><td>Last name:</td><td id="confirm_s_lname"></td></tr>
+                    <tr><td>Address 1:</td><td id="confirm_s_addr1"></td></tr>
+                    <tr><td>Address 2:</td><td id="confirm_s_addr2"></td></tr>
+                    <tr><td>City:</td><td id="confirm_s_city"></td></tr>
+                    <tr><td>State:</td><td id="confirm_s_state"></td></tr>
+                    <tr><td>Zip:</td><td id="confirm_s_zip"></td></tr>
+                    <tr><td>Country:</td><td id="confirm_s_country"></td></tr>
+                </table>
+
+                <div class="btn-group">
+                    <button class="Button" onclick="changeStep(3)"> Edit Information</button>
+                    <button class="Button-right" onclick="ajaxFinalSubmit()">Confirm and Submit the Order</button>
+                </div>
+            </div>
+
+            <div id="step-5" class="step-container">
+                <div style="text-align: center; padding: 40px;">
+                    <h2 style="color: green;">OK!  Order Placed Successfully!</h2>
+                    <p>Thank you for your purchase. Your order has entered the processing stage...</p>
+                    <a href="/catalog/index" class="Button">Return to Main Menu</a>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            // 页面加载完成后执行
+            $(document).ready(function() {
+                console.log("jQuery 加载成功，页面已就绪");
+            });
+
+            // 切换步骤的显示
+            function changeStep(step) {
+                document.querySelectorAll(".step-container").forEach(el => {
+                    el.style.display = "none";
+                    el.classList.remove("active");
+                });
+
+                const target = document.getElementById("step-" + step);
+                if (target) {
+                    target.style.display = "block";
+                    target.classList.add("active");
+                }
+
+                document.querySelectorAll(".checkout-steps div").forEach(el => {
+                    el.classList.remove("active");
+                });
+
+                // 增加非空判断，防止 nav-5 不存在时报错
+                const navItem = document.getElementById("nav-" + step);
+                if (navItem) {
+                    navItem.classList.add("active");
+                }
+            }
+
+            // 同步地址小功能
+            function syncAddress() {
+                if($("#copyAddress").is(':checked')) {
+                    $("#s_fn").val($("input[name='FirstName']").val());
+                    $("#s_a1").val($("input[name='Address1']").val());
+                }
+            }
+
+            // AJAX 提交地址信息并进入预览
+            // AJAX 提交地址信息并进入预览
+            function ajaxSaveInfo() {
+                $.ajax({
+                    url: "/order/orderUnified",
+                    type: "POST",
+                    data: $("#combinedAddressForm").serialize(),
+                    success: function(res) {
+                        if(res.trim() === "success") {
+                            // 1. 动态生成当前时间展示
+                            let now = new Date();
+                            let dateString = now.getFullYear() + '/' + (now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getDate().toString().padStart(2, '0') + ' ' + now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+                            $("#confirm_order_date").text(dateString);
+
+                            // 2. 填充 Billing Address
+                            $("#confirm_b_fname").text($("input[name='billToFirstName']").val());
+                            $("#confirm_b_lname").text($("input[name='billToLastName']").val());
+                            $("#confirm_b_addr1").text($("input[name='billAddress1']").val());
+                            $("#confirm_b_addr2").text($("input[name='billAddress2']").val());
+                            $("#confirm_b_city").text($("input[name='billCity']").val());
+                            $("#confirm_b_state").text($("input[name='billState']").val());
+                            $("#confirm_b_zip").text($("input[name='billZip']").val());
+                            $("#confirm_b_country").text($("input[name='billCountry']").val());
+
+                            // 3. 填充 Shipping Address
+                            $("#confirm_s_fname").text($("input[name='shipToFirstName']").val());
+                            $("#confirm_s_lname").text($("input[name='shipToLastName']").val());
+                            $("#confirm_s_addr1").text($("input[name='shipAddress1']").val());
+                            $("#confirm_s_addr2").text($("input[name='shipAddress2']").val());
+                            $("#confirm_s_city").text($("input[name='shipCity']").val());
+                            $("#confirm_s_state").text($("input[name='shipState']").val());
+                            $("#confirm_s_zip").text($("input[name='shipZip']").val());
+                            $("#confirm_s_country").text($("input[name='shipCountry']").val());
+
+                            // 4. 切换到 Step 4
+                            changeStep(4);
+                        } else {
+                            alert("Save failed: " + res);
+                        }
+                    },
+                    error: function() {
+                        alert("Server error, please try again.");
+                    }
+                });
+            }
+
+            // AJAX 最终提交订单
+            function ajaxFinalSubmit() {
+                $.ajax({
+                    url: "/order/orderUnified",
+                    type: "POST",
+                    data: { action: "confirmSubmit" },
+                    success: function(res) {
+                        if(res.trim() === "success") {
+                            changeStep(5);
+                        } else {
+                            alert("提交失败: " + res);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert("服务器发生错误，订单未能保存。状态码: " + xhr.status + "。请查看后端控制台日志。");
+                    }
+                });
+            }
+        </script>
+
+    </div>
+</div>
+<footer th:replace="common/bottom"></footer>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <link rel="StyleSheet" th:href="@{/css/mypetstore.css}" type="text/css" />
+</head>
+<body>
+<!-- 引入公共头部 -->
+<div th:replace="~{common/top :: top}"></div>
+
+<div id="Catalog">
+    <h2 th:text="'Search Results for: ' + ${keyword}">Search Results for: keyword</h2>
+
+    <!-- 无搜索结果提示 -->
+    <div th:if="${#lists.isEmpty(productList)}">
+        <p>No matching products found.</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(productList)}">
+        <table border="1" cellspacing="0" cellpadding="6" width="100%">
+            <tr style="background-color: #f2f2f2;">
+                <th>Product ID</th>
+                <th>Category</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+
+            <tr th:each="product : ${productList}">
+                <td th:text="${product.productId}">Product ID</td>
+                <td th:text="${product.categoryId}">Category</td>
+                <td th:text="${product.name}">Name</td>
+                <td th:text="${product.description}">Description</td>
+                <td>
+                    <form th:action="@{/catalog/product}" method="get">
+                        <input type="hidden" name="productId" th:value="${product.productId}" />
+                        <button type="submit" class="Button">View Details</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- 引入公共底部 -->
+<div th:replace="~{common/bottom :: bottom}"></div>
+</body>
+</html>

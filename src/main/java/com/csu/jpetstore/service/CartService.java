@@ -3,56 +3,55 @@ package com.csu.jpetstore.service;
 import com.csu.jpetstore.domain.Cart;
 import com.csu.jpetstore.domain.CartItem;
 import com.csu.jpetstore.domain.Item;
-import com.csu.jpetstore.persistence.CartDao;
-import com.csu.jpetstore.persistence.impl.CartDaoImpl;
+import com.csu.jpetstore.mapper.CartMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
 public class CartService {
-    private CartDao cartDao;
+
+    @Autowired
+    private CartMapper cartMapper;
+
+    @Autowired
     private CatalogService catalogService;
 
-    public CartService(CartDao cartDao) {
-        this.cartDao = new CartDaoImpl();
+    public List<CartItem> getCartItemsByUserId(String userId){
+        return cartMapper.getCartItemsByUserId(userId);
     }
 
-    // 根据用户ID查询该用户购物车中所有商品
-    public List<CartItem> getCartItemsByUserId(String userId){
-        return cartDao.getCartItemsByUserId(userId);
-    };
-
-    // 根据用户ID和商品ID查询购物车中是否已有该商品
     public CartItem getCartItem(String userId, String itemId){
-        return cartDao.getCartItem(userId, itemId);
-    };
+        return cartMapper.getCartItem(userId, itemId);
+    }
 
-    // 向购物车中添加商品
-    public void addCartItem(Cart cart, String workingItemId,String userId){
-
-        catalogService = new CatalogService();
+    @Transactional
+    public void addCartItem(Cart cart, String workingItemId, String userId){
         Item item = catalogService.getItem(workingItemId);
-        // 1. 内存 Cart 添加商品
+
         CartItem cartItem = cart.addItem(item, catalogService.isItemInStock(item.getItemId()));
 
-        // 2. 数据库同步
-        cartDao.addCartItem(cartItem,userId);
-    };
+        cartMapper.insertCartItem(cartItem, userId);
+    }
 
-    // 更新购物车中某商品的数量
-    public void updateQuantity(Cart cart,String userId, String itemId, int quantity){
+    @Transactional
+    public void updateQuantity(Cart cart, String userId, String itemId, int quantity){
         cart.setQuantityByItemId(itemId, quantity);
 
-        cartDao.updateQuantity(userId, itemId, quantity);
-    };
+        cartMapper.updateQuantity(userId, itemId, quantity);
+    }
 
-    // 删除购物车中某个商品
-    public void removeCartItem(Cart cart,String userId, String workingItemId){
+    @Transactional
+    public void removeCartItem(Cart cart, String userId, String workingItemId){
         cart.removeItemById(workingItemId);
-        cartDao.removeCartItem(userId, workingItemId);
-    };
 
-    // 清空用户购物车
+        cartMapper.deleteCartItem(userId, workingItemId);
+    }
+
+    @Transactional
     public void clearCart(String userId){
-        cartDao.clearCart(userId);
-    };
+        cartMapper.clearCart(userId);
+    }
 }
