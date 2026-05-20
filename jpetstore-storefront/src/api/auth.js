@@ -77,5 +77,5 @@ export function validateEmail(email) {
  * GitHub OAuth 登录跳转
  */
 export function loginWithGithub() {
-  window.location.href = 'http://localhost:8080/api/v1/auth/oauth/github/authorize'
+  window.location.href = 'http://localhost:8080/api/v1/auth/oauth/github/authorize?source=vue'
 }

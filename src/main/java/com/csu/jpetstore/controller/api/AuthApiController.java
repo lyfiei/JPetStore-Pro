@@ -10,7 +10,9 @@ import com.csu.jpetstore.service.GitHubOAuthService;
 import com.csu.jpetstore.util.CodeUtil;
 import com.csu.jpetstore.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -35,6 +37,9 @@ public class AuthApiController {
 
     @Autowired
     private GitHubOAuthService gitHubOAuthService;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     private final ConcurrentHashMap<String, CodeEntry> codeStore = new ConcurrentHashMap<>();
 
@@ -144,13 +149,16 @@ public class AuthApiController {
     // ==================== GitHub OAuth ====================
 
     @GetMapping("/oauth/github/authorize")
-    public void githubAuthorize(HttpServletResponse response) throws IOException {
-        String url = gitHubOAuthService.getAuthorizationUrl();
+    public void githubAuthorize(@RequestParam(required = false) String source,
+                                HttpServletResponse response) throws IOException {
+        String state = source != null ? source : "thymeleaf";
+        String url = gitHubOAuthService.getAuthorizationUrl(state);
         response.sendRedirect(url);
     }
 
     @GetMapping("/oauth/github/callback")
     public void githubCallback(@RequestParam String code,
+                               @RequestParam(required = false) String state,
                                HttpServletResponse response,
                                HttpSession session) throws IOException {
         try {
@@ -158,12 +166,29 @@ public class AuthApiController {
             Map<String, Object> githubUser = gitHubOAuthService.getUserInfo(accessToken);
             Account account = gitHubOAuthService.findOrCreateAccount(githubUser);
 
-            account.setPassword(null);
-            session.setAttribute("loginAccount", account);
-
-            response.sendRedirect("/mainForm");
+            if ("vue".equals(state)) {
+                String token = jwtUtil.generateToken(account.getUsername());
+                String redirectUrl = UriComponentsBuilder.fromHttpUrl(frontendUrl + "/login")
+                        .queryParam("token", token)
+                        .queryParam("username", account.getUsername())
+                        .build()
+                        .toUriString();
+                response.sendRedirect(redirectUrl);
+            } else {
+                account.setPassword(null);
+                session.setAttribute("loginAccount", account);
+                response.sendRedirect("/mainForm");
+            }
         } catch (Exception e) {
-            response.sendRedirect("/signOnForm?signOnMsg=GitHub login failed: " + e.getMessage());
+            if ("vue".equals(state)) {
+                String redirectUrl = UriComponentsBuilder.fromHttpUrl(frontendUrl + "/login")
+                        .queryParam("error", "GitHub login failed: " + e.getMessage())
+                        .build()
+                        .toUriString();
+                response.sendRedirect(redirectUrl);
+            } else {
+                response.sendRedirect("/signOnForm?signOnMsg=GitHub login failed: " + e.getMessage());
+            }
         }
     }
 

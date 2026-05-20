@@ -33,12 +33,15 @@ public class GitHubOAuthService {
     private static final String USER_API = "https://api.github.com/user";
     private static final String EMAILS_API = "https://api.github.com/user/emails";
 
-    public String getAuthorizationUrl() {
-        return UriComponentsBuilder.fromHttpUrl(AUTH_URL)
+    public String getAuthorizationUrl(String state) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(AUTH_URL)
                 .queryParam("client_id", clientId)
                 .queryParam("redirect_uri", redirectUri)
-                .queryParam("scope", "user:email")
-                .toUriString();
+                .queryParam("scope", "user:email");
+        if (state != null && !state.isEmpty()) {
+            builder.queryParam("state", state);
+        }
+        return builder.toUriString();
     }
 
     public String getAccessToken(String code) {
