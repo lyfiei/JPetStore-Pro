@@ -32,4 +32,13 @@ public class AddressService {
     public Address getAddressById(int addressId) {
         return addressMapper.getAddressById(addressId);
     }
+
+    public void setDefaultAddress(int addressId) {
+        Address address = addressMapper.getAddressById(addressId);
+        if (address != null) {
+            addressMapper.updateDefaultFlag(address.getUsername(), false);
+            address.setIsDefault(true);
+            addressMapper.updateAddress(address);
+        }
+    }
 }

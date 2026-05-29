@@ -44,4 +44,10 @@ public class AddressApiController {
         addressService.deleteAddress(addressId);
         return Result.success();
     }
+
+    @PutMapping("/{addressId}/default")
+    public Result<Void> setDefaultAddress(@PathVariable int addressId) {
+        addressService.setDefaultAddress(addressId);
+        return Result.success();
+    }
 }

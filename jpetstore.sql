@@ -469,3 +469,10 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-05-29 12:55:26
+-- 为address表添加phone和is_default字段
+ALTER TABLE `address`
+ADD COLUMN `phone` varchar(20) DEFAULT NULL AFTER `last_name`,
+ADD COLUMN `is_default` tinyint(1) DEFAULT 0 AFTER `country`;
+
+-- 为现有数据设置一个默认地址(可选)
+UPDATE `address` SET `is_default` = 1 WHERE `address_id` = 1 LIMIT 1;

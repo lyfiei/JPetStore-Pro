@@ -313,13 +313,13 @@ const loadAddresses = async () => {
     const res = await getAddressList()
     addresses.value = res.data || []
     
-    // 如果没有选中地址，默认选择第一个
     if (!selectedAddress.value && addresses.value.length > 0) {
       const defaultAddr = addresses.value.find(addr => addr.isDefault)
       selectedAddress.value = defaultAddr || addresses.value[0]
     }
   } catch (error) {
     console.error('加载地址失败:', error)
+    ElMessage.error('加载地址失败')
   }
 }
 
