@@ -4,7 +4,7 @@
       <template #header>
         <h2>用户登录</h2>
       </template>
-      
+
       <el-form :model="loginForm" :rules="rules" ref="formRef" label-width="80px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="loginForm.username" placeholder="请输入用户名" />
@@ -97,7 +97,12 @@ const handleLogin = async () => {
         const res = await login(loginForm)
         localStorage.setItem('token', res.data.token)
         localStorage.setItem('userInfo', JSON.stringify(res.data.userInfo))
-        
+
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'token',
+          newValue: res.data.token
+        }))
+
         ElMessage.success('登录成功')
         router.push('/')
       } catch (error) {

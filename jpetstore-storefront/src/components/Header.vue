@@ -14,10 +14,10 @@
 
         <div class="header-search">
           <el-input
-            v-model="searchKeyword"
-            placeholder="搜索宠物用品、零食、玩具..."
-            class="search-input"
-            @keyup.enter="handleSearch"
+              v-model="searchKeyword"
+              placeholder="搜索宠物用品、零食、玩具..."
+              class="search-input"
+              @keyup.enter="handleSearch"
           >
             <template #prefix>
               <el-icon class="search-icon"><Search /></el-icon>
@@ -74,41 +74,44 @@
             </router-link>
           </li>
           <li
-            :class="{ active: activeMenu.startsWith('/category') }"
-            class="nav-dropdown"
-            @mouseenter="openDropdown"
-            @mouseleave="closeDropdown"
+              :class="{ active: activeMenu.startsWith('/category') }"
+              class="nav-dropdown"
+              @mouseenter="openDropdown"
+              @mouseleave="closeDropdown"
+              @click.stop="toggleDropdown"
           >
-            <span class="nav-dropdown-trigger" @click="toggleDropdown">
+            <span class="nav-dropdown-trigger" @click.stop="toggleDropdown">
               商品分类
               <el-icon class="chevron" :class="{ rotated: showDropdown }"><ArrowDown /></el-icon>
             </span>
             <div
-              v-if="showDropdown"
-              class="nav-dropdown-panel"
-              @mouseenter="cancelClose"
-              @mouseleave="closeDropdown"
+                v-if="showDropdown"
+                class="nav-dropdown-panel"
+                @mouseenter="cancelClose"
+                @mouseleave="closeDropdown"
+                @click.stop
             >
-                <div
+              <div
                   v-for="cat in categories"
                   :key="cat.categoryId"
                   class="nav-dropdown-item"
                   @click.stop="goToCategory(cat.categoryId)"
-                >
-                  <img
+              >
+                <img
                     :src="getCategoryIcon(cat.categoryId)"
                     :alt="cat.name"
                     class="dropdown-icon"
                     @error="e => e.target.src = '/images/logo-parrot.svg'"
-                  />
-                  <span class="dropdown-label">
+                />
+                <span class="dropdown-label">
                     <span class="dropdown-cn">{{ cat.name }}</span>
                     <span class="dropdown-sep">|</span>
                     <span class="dropdown-en">{{ getEnglishName(cat.categoryId) }}</span>
                   </span>
-                </div>
               </div>
+            </div>
           </li>
+
           <li :class="{ active: activeMenu === '/help' }">
             <router-link to="/help">帮助</router-link>
           </li>
@@ -137,6 +140,7 @@ const showDropdown = ref(false)
 let closeTimer = null
 const isLogin = ref(!!localStorage.getItem('token'))
 const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{}'))
+const isTouchDevice = ref(false)
 
 const activeMenu = computed(() => route.path)
 
@@ -153,6 +157,7 @@ const goToFavorite = () => {
 }
 
 const openDropdown = () => {
+  if (isTouchDevice.value) return
   cancelClose()
   showDropdown.value = true
 }
@@ -163,6 +168,7 @@ const closeDropdown = () => {
   }, 150)
 }
 
+
 const cancelClose = () => {
   if (closeTimer) {
     clearTimeout(closeTimer)
@@ -171,12 +177,9 @@ const cancelClose = () => {
 }
 
 const toggleDropdown = () => {
-  if (showDropdown.value) {
-    showDropdown.value = false
-  } else {
-    openDropdown()
-  }
+  showDropdown.value = !showDropdown.value
 }
+
 
 const goToCategory = (categoryId) => {
   showDropdown.value = false
@@ -238,6 +241,18 @@ const handleLogout = async () => {
 }
 
 onMounted(() => {
+  isTouchDevice.value = window.matchMedia('(pointer: coarse)').matches
+
+  const handleClickOutside = (e) => {
+    const dropdown = document.querySelector('.nav-dropdown')
+    if (dropdown && !dropdown.contains(e.target)) {
+      showDropdown.value = false
+    }
+  }
+
+  document.addEventListener('click', handleClickOutside)
+
+
   const updateUserInfo = () => {
     const token = localStorage.getItem('token')
     isLogin.value = !!token
@@ -248,8 +263,12 @@ onMounted(() => {
 
   loadCategories()
 
-  return () => window.removeEventListener('storage', updateUserInfo)
+  return () => {
+    window.removeEventListener('storage', updateUserInfo)
+    document.removeEventListener('click', handleClickOutside)
+  }
 })
+
 </script>
 
 <style scoped>
@@ -548,6 +567,38 @@ onMounted(() => {
 
   .user-name {
     display: none;
+  }
+
+  .nav-dropdown-panel {
+    position: fixed;
+    top: auto;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    min-width: auto;
+    margin-top: 4px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 4px;
+  }
+
+  .nav-dropdown-item {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .dropdown-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .dropdown-label {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .dropdown-en {
+    font-size: 11px;
   }
 }
 </style>
