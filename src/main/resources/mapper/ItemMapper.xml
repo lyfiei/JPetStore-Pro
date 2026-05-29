@@ -30,9 +30,12 @@
             I.PRODUCTID AS product_productId, NAME AS product_name,
             DESCN AS product_description, CATEGORY AS product_categoryId,
             STATUS, ATTR1 AS attribute1, ATTR2 AS attribute2, ATTR3 AS attribute3,
-            ATTR4 AS attribute4, ATTR5 AS attribute5
-        FROM ITEM I, PRODUCT P
-        WHERE P.PRODUCTID = I.PRODUCTID AND I.PRODUCTID = #{productId}
+            ATTR4 AS attribute4, ATTR5 AS attribute5,
+            COALESCE(V.QTY, 0) AS quantity
+        FROM ITEM I
+        JOIN PRODUCT P ON P.PRODUCTID = I.PRODUCTID
+        LEFT JOIN INVENTORY V ON I.ITEMID = V.ITEMID
+        WHERE I.PRODUCTID = #{productId}
     </select>
 
     <select id="getItem" parameterType="string" resultMap="itemResultMap">

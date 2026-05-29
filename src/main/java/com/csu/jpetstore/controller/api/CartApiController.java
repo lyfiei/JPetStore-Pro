@@ -1,14 +1,15 @@
 package com.csu.jpetstore.controller.api;
 
-import com.csu.jpetstore.domain.Account;
 import com.csu.jpetstore.domain.Cart;
 import com.csu.jpetstore.domain.CartItem;
 import com.csu.jpetstore.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,15 +28,22 @@ public class CartApiController {
      * GET /api/v1/cart
      */
     @GetMapping
-    public Map<String, Object> viewCart(HttpSession session) {
-        Account account = (Account) session.getAttribute("loginAccount");
-        Cart cart = (Cart) session.getAttribute("cart");
+    public Map<String, Object> viewCart(HttpServletRequest request) {
+        String username = (String) request.getAttribute("username");
 
-        // TODO: 返回统一响应格式
+        Cart cart = new Cart();
+        if (username != null) {
+            List<CartItem> dbItems = cartService.getCartItemsByUserId(username);
+            for (CartItem item : dbItems) {
+                cart.addItem(item.getItem(), item.isInStock());
+                cart.setQuantityByItemId(item.getItem().getItemId(), item.getQuantity());
+            }
+        }
+
         Map<String, Object> result = new HashMap<>();
         result.put("code", 200);
         result.put("message", "success");
-        result.put("data", cart);
+        result.put("data", buildCartData(cart));
 
         return result;
     }
@@ -46,21 +54,26 @@ public class CartApiController {
      */
     @PostMapping("/items")
     public Map<String, Object> addItem(
-            @RequestParam String itemId,
-            @RequestParam(defaultValue = "1") int quantity,
-            HttpSession session) {
-        
-        Account account = (Account) session.getAttribute("loginAccount");
-        Cart cart = (Cart) session.getAttribute("cart");
+            @RequestBody Map<String, Object> body,
+            HttpServletRequest request) {
 
-        if (cart == null) {
-            cart = new Cart();
+        String username = (String) request.getAttribute("username");
+        String itemId = (String) body.get("itemId");
+        int quantity = body.get("quantity") != null ? ((Number) body.get("quantity")).intValue() : 1;
+
+        Cart cart = new Cart();
+        List<CartItem> dbItems = cartService.getCartItemsByUserId(username);
+        for (CartItem ci : dbItems) {
+            cart.addItem(ci.getItem(), ci.isInStock());
+            cart.setQuantityByItemId(ci.getItem().getItemId(), ci.getQuantity());
         }
 
-        // TODO: 调用 CartService 添加商品
-        // cartService.addCartItem(cart, itemId, account.getUsername());
-
-        session.setAttribute("cart", cart);
+        CartItem existingItem = cartService.getCartItem(username, itemId);
+        if (existingItem != null) {
+            cartService.updateQuantity(cart, username, itemId, existingItem.getQuantity() + quantity);
+        } else {
+            cartService.addCartItem(cart, itemId, username);
+        }
 
         Map<String, Object> result = new HashMap<>();
         result.put("code", 200);
@@ -76,20 +89,20 @@ public class CartApiController {
     @PutMapping("/items/{itemId}")
     public Map<String, Object> updateItem(
             @PathVariable String itemId,
-            @RequestParam int quantity,
-            HttpSession session) {
+            @RequestBody Map<String, Object> body,
+            HttpServletRequest request) {
 
-        Account account = (Account) session.getAttribute("loginAccount");
-        Cart cart = (Cart) session.getAttribute("cart");
+        String username = (String) request.getAttribute("username");
+        int quantity = body.get("quantity") != null ? ((Number) body.get("quantity")).intValue() : 1;
 
-        if (cart == null) {
-            cart = new Cart();
+        Cart cart = new Cart();
+        List<CartItem> dbItems = cartService.getCartItemsByUserId(username);
+        for (CartItem ci : dbItems) {
+            cart.addItem(ci.getItem(), ci.isInStock());
+            cart.setQuantityByItemId(ci.getItem().getItemId(), ci.getQuantity());
         }
 
-        // TODO: 调用 CartService 更新数量
-        // cartService.updateQuantity(cart, account.getUsername(), itemId, quantity);
-
-        session.setAttribute("cart", cart);
+        cartService.updateQuantity(cart, username, itemId, quantity);
 
         Map<String, Object> result = new HashMap<>();
         result.put("code", 200);
@@ -105,19 +118,18 @@ public class CartApiController {
     @DeleteMapping("/items/{itemId}")
     public Map<String, Object> removeItem(
             @PathVariable String itemId,
-            HttpSession session) {
+            HttpServletRequest request) {
 
-        Account account = (Account) session.getAttribute("loginAccount");
-        Cart cart = (Cart) session.getAttribute("cart");
+        String username = (String) request.getAttribute("username");
 
-        if (cart == null) {
-            cart = new Cart();
+        Cart cart = new Cart();
+        List<CartItem> dbItems = cartService.getCartItemsByUserId(username);
+        for (CartItem ci : dbItems) {
+            cart.addItem(ci.getItem(), ci.isInStock());
+            cart.setQuantityByItemId(ci.getItem().getItemId(), ci.getQuantity());
         }
 
-        // TODO: 调用 CartService 删除商品
-        // cartService.removeCartItem(cart, account.getUsername(), itemId);
-
-        session.setAttribute("cart", cart);
+        cartService.removeCartItem(cart, username, itemId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("code", 200);
@@ -131,20 +143,40 @@ public class CartApiController {
      * DELETE /api/v1/cart
      */
     @DeleteMapping
-    public Map<String, Object> clearCart(HttpSession session) {
-        Account account = (Account) session.getAttribute("loginAccount");
+    public Map<String, Object> clearCart(HttpServletRequest request) {
+        String username = (String) request.getAttribute("username");
 
-        if (account != null) {
-            // TODO: 调用 CartService 清空购物车
-            // cartService.clearCart(account.getUsername());
+        if (username != null) {
+            cartService.clearCart(username);
         }
-
-        session.removeAttribute("cart");
 
         Map<String, Object> result = new HashMap<>();
         result.put("code", 200);
         result.put("message", "购物车已清空");
 
         return result;
+    }
+
+    /**
+     * 将 Cart 对象转换为前端期望的扁平格式
+     */
+    private Map<String, Object> buildCartData(Cart cart) {
+        Map<String, Object> data = new HashMap<>();
+        List<Map<String, Object>> cartItems = new ArrayList<>();
+
+        for (CartItem ci : cart.getCartItemList()) {
+            Map<String, Object> itemData = new HashMap<>();
+            itemData.put("itemId", ci.getItem().getItemId());
+            itemData.put("productId", ci.getItem().getProductId());
+            itemData.put("productName", ci.getItem().getProduct() != null ? ci.getItem().getProduct().getName() : "");
+            itemData.put("description", ci.getItem().getProduct() != null ? ci.getItem().getProduct().getDescription() : "");
+            itemData.put("listPrice", ci.getItem().getListPrice());
+            itemData.put("quantity", ci.getQuantity());
+            itemData.put("inStock", ci.isInStock());
+            cartItems.add(itemData);
+        }
+
+        data.put("cartItems", cartItems);
+        return data;
     }
 }

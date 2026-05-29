@@ -17,91 +17,55 @@
     <!-- 商品详情 -->
     <div v-else-if="product" class="product-detail">
       <div class="product-main">
-        <!-- 商品图片 -->
-        <div class="product-image-section">
+        <div class="product-gallery">
           <div class="main-image">
-            <img 
-              :src="currentImage" 
-              :alt="product.name"
-              @error="handleImageError"
-            />
+            <img :src="currentImage" :alt="product.name" @error="handleImageError" />
+          </div>
+          <div class="thumbs">
+            <img v-for="img in gallery" :key="img" :src="img" @click="currentImage = img" class="thumb" />
           </div>
         </div>
 
-        <!-- 商品信息 -->
-        <div class="product-info-section">
+        <div class="product-meta">
           <h1 class="product-title">{{ product.name }}</h1>
-          <p class="product-description">{{ product.description }}</p>
+          <p class="product-description">{{ stripHtml(product.description) }}</p>
 
-          <!-- 规格选择 -->
           <div v-if="items.length > 0" class="specifications">
-            <h3>选择规格</h3>
-            <div class="item-list">
-              <div 
-                v-for="item in items" 
-                :key="item.itemId"
-                class="item-option"
-                :class="{ selected: selectedItem?.itemId === item.itemId }"
-                @click="selectItem(item)"
-              >
-                <div class="item-header">
-                  <span class="item-name">{{ item.attribute1 || '标准版' }}</span>
-                  <span class="item-price">¥{{ item.listPrice }}</span>
-                </div>
-                <div class="item-footer">
-                  <span class="item-stock" :class="{ 'out-of-stock': item.stock === 0 }">
-                    {{ item.stock > 0 ? `库存: ${item.stock}` : '缺货' }}
-                  </span>
-                </div>
+            <h4>规格</h4>
+            <div class="spec-grid">
+              <div v-for="item in items" :key="item.itemId" class="spec-card" :class="{selected: selectedItem?.itemId===item.itemId}" @click="selectItem(item)">
+                <div class="spec-name">{{ item.attribute1 || '标准版' }}</div>
+                <div class="spec-price">¥{{ item.listPrice }}</div>
+                <div class="spec-stock" :class="{ 'out': item.stock===0 }">{{ item.stock>0?`库存 ${item.stock}`:'缺货' }}</div>
               </div>
             </div>
           </div>
 
-          <!-- 数量选择 -->
-          <div v-if="selectedItem" class="quantity-selector">
-            <label>数量：</label>
-            <el-input-number 
-              v-model="quantity" 
-              :min="1" 
-              :max="selectedItem.stock"
-              size="large"
-            />
-          </div>
-
-          <!-- 操作按钮 -->
-          <div class="action-buttons">
-            <el-button 
-              type="primary" 
+          <div class="purchase">
+            <el-input-number v-model="quantity" :min="1" :max="selectedItem?.stock || 1" size="large" />
+            <el-button
+              class="add-cart-btn"
+              type="primary"
               size="large"
               :disabled="!selectedItem || selectedItem.stock === 0"
               @click="addToCart"
             >
-              <el-icon><ShoppingCart /></el-icon>
-              加入购物车
+              <el-icon size="18"><ShoppingCart /></el-icon> 加入购物车
             </el-button>
           </div>
 
-          <!-- 其他信息 -->
-          <div class="additional-info">
+          <div class="product-info-extra">
             <el-divider />
-            <div class="info-row">
-              <span class="label">商品编号：</span>
-              <span class="value">{{ product.productId }}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">分类：</span>
-              <span class="value">{{ product.categoryId }}</span>
-            </div>
+            <div>商品编号：{{ product.productId }}</div>
+            <div>分类：{{ product.categoryId }}</div>
           </div>
         </div>
       </div>
 
-      <!-- 商品详情描述 -->
       <div class="product-details-section">
         <h2>商品详情</h2>
         <div class="details-content">
-          <p>{{ product.description }}</p>
-          <p>我们提供优质的宠物用品，确保您的宠物得到最好的照顾。</p>
+          <p v-html="product.description"></p>
         </div>
       </div>
     </div>
@@ -112,12 +76,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ShoppingCart } from '@element-plus/icons-vue'
 import { getProductDetail } from '../api/product'
 import { useCartStore } from '../stores/cart'
+import { stripHtml, extractImageSrc } from '../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -129,19 +94,12 @@ const items = ref([])
 const selectedItem = ref(null)
 const quantity = ref(1)
 
-// 当前显示的图片
-const currentImage = computed(() => {
-  if (!product.value) return '/images/placeholder.png'
-  const imageMap = {
-    'FI-SW-01': '/images/fish1.jpg',
-    'FI-SW-02': '/images/fish2.jpg',
-    'K9-DL-01': '/images/dog1.jpg',
-  }
-  return imageMap[product.value.productId] || '/images/placeholder.png'
-})
+// 图片画廊与当前图片
+const gallery = ref([])
+const currentImage = ref('/images/splash.gif')
 
 const handleImageError = (e) => {
-  e.target.src = '/images/placeholder.png'
+  e.target.src = '/images/splash.gif'
 }
 
 // 选择规格项
@@ -186,7 +144,12 @@ const loadProductData = async () => {
     if (res.data) {
       product.value = res.data.product
       items.value = res.data.items || []
-      
+
+      // 从数据库 description 提取商品图片
+      const mainImg = extractImageSrc(product.value.description) || '/images/splash.gif'
+      gallery.value = [mainImg]
+      currentImage.value = mainImg
+
       // 默认选择第一个有库存的规格
       if (items.value.length > 0) {
         const availableItem = items.value.find(item => item.stock > 0)
@@ -206,6 +169,10 @@ const loadProductData = async () => {
 }
 
 onMounted(() => {
+  loadProductData()
+})
+
+watch(() => route.params.productId, () => {
   loadProductData()
 })
 </script>
@@ -260,11 +227,40 @@ onMounted(() => {
   height: 100%;
   object-fit: cover;
 }
-
-.product-info-section {
+.product-meta {
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.product-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-gallery .main-image {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.product-gallery .thumbs {
+  display: flex;
+  gap: 8px;
+}
+
+.product-gallery .thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.product-gallery .thumb:hover {
+  border-color: var(--accent);
 }
 
 .product-title {
@@ -279,69 +275,59 @@ onMounted(() => {
   color: #7f8c8d;
   line-height: 1.8;
 }
-
-.specifications h3 {
+.specifications h4 {
   font-size: 18px;
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 16px;
 }
-
-.item-list {
-  display: flex;
-  flex-direction: column;
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
 }
 
-.item-option {
-  padding: 16px;
-  border: 2px solid #e9ecef;
+.spec-card {
+  padding: 12px;
   border-radius: 8px;
+  border: 1px solid #e9ecef;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all .18s;
+  text-align: center;
 }
 
-.item-option:hover {
-  border-color: #667eea;
-  background: #f8f9ff;
+.spec-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px rgba(58,125,92,0.15);
 }
 
-.item-option.selected {
-  border-color: #667eea;
-  background: #f0f2ff;
-}
+.spec-name { font-weight: 600; color: #2c3e50; }
+.spec-price { color: var(--accent); font-weight: 700; margin-top: 8px; }
+.spec-stock { font-size: 13px; color: #27ae60; margin-top: 6px; }
+.spec-stock.out { color: #e74c3c; }
 
-.item-header {
+.purchase {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 16px;
+  padding: 16px 0;
 }
 
-.item-name {
-  font-weight: 500;
-  color: #495057;
+.add-cart-btn {
+  flex: 1;
+  height: 50px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  background: #2d7a4f !important;
+  border-color: #2d7a4f !important;
+  color: #fff !important;
 }
 
-.item-price {
-  font-size: 20px;
-  font-weight: 600;
-  color: #e74c3c;
-}
-
-.item-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.item-stock {
-  font-size: 13px;
-  color: #27ae60;
-}
-
-.item-stock.out-of-stock {
-  color: #e74c3c;
+.add-cart-btn.is-disabled,
+.add-cart-btn:disabled {
+  background: #c0c8b8 !important;
+  border-color: #c0c8b8 !important;
+  color: rgba(255,255,255,0.7) !important;
 }
 
 .quantity-selector {

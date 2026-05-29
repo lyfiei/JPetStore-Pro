@@ -1,5 +1,7 @@
 package com.csu.jpetstore.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.List;
 
@@ -47,7 +49,23 @@ public class Product implements Serializable {
         return getName();
     }
 
-    public List<Item> getItemList() { return itemList; }
-    public void setItemList(List<Item> itemList) { this.itemList = itemList; }
+    @JsonIgnore
+    public List<Item> getItemList() {
+        return itemList;
+    }
+
+    public void setItemList(List<Item> itemList) {
+        this.itemList = itemList;
+    }
+
+    @JsonProperty("items")
+    public List<Item> getItems() {
+        return itemList;
+    }
+
+    @JsonProperty("items")
+    public void setItems(List<Item> items) {
+        this.itemList = items;
+    }
 
 }

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="400" viewBox="0 0 1400 400">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#ffd89b" />
+      <stop offset="1" stop-color="#ff8c1a" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)" rx="12"/>
+  <g fill="#fff" font-family="Segoe UI, Roboto, sans-serif">
+    <text x="60" y="120" font-size="44" font-weight="700">宠物食品大促</text>
+    <text x="60" y="170" font-size="22">精选零食，营养美味，限时优惠</text>
+    <rect x="60" y="200" width="180" height="48" rx="8" fill="#fff" opacity="0.12" />
+    <text x="80" y="234" font-size="18" fill="#fff">立即选购</text>
+  </g>
+  <g transform="translate(960,40)">
+    <circle cx="120" cy="100" r="100" fill="#fff" opacity="0.18" />
+    <text x="40" y="120" font-size="20" fill="#fff">🐶🐱</text>
+  </g>
+</svg>

@@ -121,15 +121,28 @@ const cartStore = useCartStore()
 // 获取商品图片
 const getItemImage = (productId) => {
   const imageMap = {
-    'FI-SW-01': '/images/fish1.jpg',
-    'FI-SW-02': '/images/fish2.jpg',
-    'K9-DL-01': '/images/dog1.jpg',
+    'FI-SW-01': '/images/fish1.gif',
+    'FI-SW-02': '/images/fish2.gif',
+    'FI-FW-01': '/images/fish3.gif',
+    'FI-FW-02': '/images/fish4.gif',
+    'K9-DL-01': '/images/dog1.gif',
+    'K9-PO-02': '/images/dog2.gif',
+    'K9-RT-01': '/images/dog3.gif',
+    'K9-RT-02': '/images/dog4.gif',
+    'K9-CW-01': '/images/dog5.gif',
+    'K9-BD-01': '/images/dog6.gif',
+    'RP-LI-02': '/images/lizard1.gif',
+    'RP-SN-01': '/images/snake1.gif',
+    'AV-CB-01': '/images/bird1.gif',
+    'AV-SB-01': '/images/bird2.gif',
+    'FL-DSH-01': '/images/cat1.gif',
+    'FL-DL-02': '/images/cat2.gif',
   }
-  return imageMap[productId] || '/images/placeholder.png'
+  return imageMap[productId] || '/images/splash.gif'
 }
 
 const handleImageError = (e) => {
-  e.target.src = '/images/placeholder.png'
+  e.target.src = '/images/splash.gif'
 }
 
 // 去购物
@@ -314,7 +327,7 @@ onMounted(async () => {
 .subtotal-value {
   font-size: 18px;
   font-weight: 600;
-  color: #e74c3c;
+  color: var(--accent);
 }
 
 .item-quantity {
@@ -365,7 +378,7 @@ onMounted(async () => {
 .summary-value.price {
   font-size: 24px;
   font-weight: 600;
-  color: #e74c3c;
+  color: var(--accent);
 }
 
 .summary-actions {

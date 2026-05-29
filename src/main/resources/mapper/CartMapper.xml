@@ -36,7 +36,7 @@
             i.ATTR4 AS attr4,
             i.ATTR5 AS attr5,
             p.name,
-            p.description
+            p.descn AS description
         FROM cart c
                  JOIN item i ON c.item_id = i.ITEMID
                  JOIN product p ON c.product_id = p.PRODUCTID
@@ -56,23 +56,23 @@
             i.ATTR4 AS attr4,
             i.ATTR5 AS attr5,
             p.name,
-            p.description
+            p.descn AS description
         FROM cart c
                  JOIN item i ON c.item_id = i.ITEMID
                  JOIN product p ON c.product_id = p.PRODUCTID
         WHERE c.user_id = #{userId} AND c.item_id = #{itemId}
     </select>
 
-    <insert id="insertCartItem" parameterType="com.csu.jpetstore.domain.CartItem">
+    <insert id="insertCartItem">
         INSERT INTO cart (user_id, item_id, product_id, description, in_stock, quantity, list_price)
         VALUES (
                    #{userId},
-                   #{item.itemId},
-                   #{item.productId},
-                   #{item.product.description},
-                   #{inStock},
-                   #{quantity},
-                   #{item.listPrice}
+                   #{cartItem.item.itemId},
+                   #{cartItem.item.product.productId},
+                   #{cartItem.item.product.description},
+                   #{cartItem.inStock},
+                   #{cartItem.quantity},
+                   #{cartItem.item.listPrice}
                )
     </insert>
 

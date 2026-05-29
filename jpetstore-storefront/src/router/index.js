@@ -60,6 +60,12 @@ const routes = [
     name: 'Checkout',
     component: () => import('@/views/Checkout.vue'),
     meta: { title: '订单确认', requiresAuth: true }
+  },
+  {
+    path: '/help',
+    name: 'Help',
+    component: () => import('@/views/Help.vue'),
+    meta: { title: '帮助中心' }
   }
 ]
 

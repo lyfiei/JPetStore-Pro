@@ -273,7 +273,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getProfile, updateProfile, changePassword as updatePassword } from '../api/account'
+import { getProfile, updateProfile as updateProfileApi, changePassword as updatePassword } from '../api/account'
 import { getOrderList } from '../api/order'
 import { getAddressList, addAddress, updateAddress, deleteAddress, setDefaultAddress as setDefault } from '../api/address'
 
@@ -422,7 +422,7 @@ const updateProfile = async () => {
     if (valid) {
       updating.value = true
       try {
-        await updateProfile(profileForm)
+        await updateProfileApi(profileForm)
         ElMessage.success('更新成功')
       } catch (error) {
         ElMessage.error('更新失败')

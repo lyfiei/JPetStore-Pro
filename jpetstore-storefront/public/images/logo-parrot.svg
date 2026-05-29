@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs>
+    <linearGradient id="parrotGlow" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f8f1e6" />
+      <stop offset="100%" stop-color="#e9b56a" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="32" fill="url(#parrotGlow)" />
+  <g transform="translate(40 30)">
+    <ellipse cx="44" cy="70" rx="34" ry="42" fill="#5a7d4c" />
+    <path d="M20 52c0-18 14-30 30-30s30 12 30 30c0 20-18 38-26 42-8-4-26-22-26-42Z" fill="#3f5937" />
+    <circle cx="52" cy="52" r="12" fill="#f4ede1" />
+    <circle cx="56" cy="50" r="5" fill="#23401d" />
+    <path d="M52 58c10 6 22 8 26 8s-2 10-14 16-14-12-12-20Z" fill="#f5c28a" />
+    <path d="M60 36c6 0 10 4 10 10s-4 10-10 10-10-4-10-10 4-10 10-10Z" fill="#fff3da" opacity="0.8" />
+  </g>
+</svg>

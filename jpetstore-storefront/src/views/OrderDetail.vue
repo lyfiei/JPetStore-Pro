@@ -296,7 +296,7 @@ onMounted(() => {
 }
 
 .status-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
   color: white;
 }
 
@@ -408,7 +408,7 @@ onMounted(() => {
 .item-total .value.price {
   font-size: 18px;
   font-weight: 600;
-  color: #e74c3c;
+  color: var(--accent);
 }
 
 .address-info p {
@@ -468,7 +468,7 @@ onMounted(() => {
 .total-row .value.price {
   font-size: 28px;
   font-weight: 600;
-  color: #e74c3c;
+  color: var(--accent);
 }
 
 .action-buttons {

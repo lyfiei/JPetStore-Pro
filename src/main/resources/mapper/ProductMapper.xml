@@ -14,6 +14,7 @@
             <id property="itemId" column="itemId" />
             <result property="listPrice" column="listPrice" />
             <result property="attribute1" column="attribute1" />
+            <result property="quantity" column="stock" />
         </collection>
     </resultMap>
 
@@ -25,9 +26,11 @@
             P.CATEGORY as categoryId,
             I.ITEMID as itemId,
             I.LISTPRICE as listPrice,
-            I.ATTR1 as attribute1
+            I.ATTR1 as attribute1,
+            COALESCE(V.QTY, 0) as stock
         FROM PRODUCT P
                  LEFT JOIN ITEM I ON P.PRODUCTID = I.PRODUCTID
+                 LEFT JOIN INVENTORY V ON I.ITEMID = V.ITEMID
         WHERE P.CATEGORY = #{categoryId}
     </select>
 

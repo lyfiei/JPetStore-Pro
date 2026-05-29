@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class AddressService {
-    
+
     @Autowired
     private AddressMapper addressMapper;
 
@@ -17,11 +17,19 @@ public class AddressService {
         addressMapper.insertAddress(address);
     }
 
+    public void updateAddress(Address address) {
+        addressMapper.updateAddress(address);
+    }
+
+    public void deleteAddress(int addressId) {
+        addressMapper.deleteAddress(addressId);
+    }
+
     public List<Address> getAddressListByUsername(String username) {
         return addressMapper.getAddressListByUsername(username);
     }
 
-    public Address getAddressById(int addressId) { // ✅ 新增
+    public Address getAddressById(int addressId) {
         return addressMapper.getAddressById(addressId);
     }
 }

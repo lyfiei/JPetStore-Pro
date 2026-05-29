@@ -53,20 +53,30 @@
               <h3>配送方式</h3>
             </template>
             
-            <el-radio-group v-model="shippingMethod" class="shipping-options">
-              <el-radio label="UPS" border>
-                <div class="shipping-option">
-                  <div class="option-name">标准配送</div>
-                  <div class="option-desc">3-5个工作日</div>
+            <div class="shipping-options">
+              <div
+                class="shipping-card"
+                :class="{ active: shippingMethod === 'UPS' }"
+                @click="shippingMethod = 'UPS'"
+              >
+                <div class="shipping-card-header">
+                  <span class="shipping-name">标准配送</span>
+                  <span class="shipping-price">¥10.00</span>
                 </div>
-              </el-radio>
-              <el-radio label="FedEx" border>
-                <div class="shipping-option">
-                  <div class="option-name">快速配送</div>
-                  <div class="option-desc">1-2个工作日</div>
+                <div class="shipping-desc">预计 3-5 个工作日送达</div>
+              </div>
+              <div
+                class="shipping-card"
+                :class="{ active: shippingMethod === 'FedEx' }"
+                @click="shippingMethod = 'FedEx'"
+              >
+                <div class="shipping-card-header">
+                  <span class="shipping-name">快速配送</span>
+                  <span class="shipping-price">¥20.00</span>
                 </div>
-              </el-radio>
-            </el-radio-group>
+                <div class="shipping-desc">预计 1-2 个工作日送达</div>
+              </div>
+            </div>
           </el-card>
 
           <!-- 支付信息 -->
@@ -126,11 +136,17 @@
             
             <!-- 商品列表 -->
             <div class="summary-items">
-              <div 
-                v-for="item in cartStore.cartItems" 
+              <div
+                v-for="item in cartStore.cartItems"
                 :key="item.itemId"
                 class="summary-item"
               >
+                <img
+                  :src="getProductImage(item)"
+                  :alt="item.productName"
+                  class="item-image"
+                  @error="e => e.target.src = '/images/splash.gif'"
+                />
                 <div class="item-basic">
                   <span class="item-name">{{ item.productName }}</span>
                   <span class="item-quantity">x{{ item.quantity }}</span>
@@ -219,6 +235,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { useCartStore } from '../stores/cart'
 import { createOrder } from '../api/order'
 import { getAddressList } from '../api/address'
+import { extractImageSrc } from '../utils/format'
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -249,6 +266,14 @@ const paymentRules = {
     { required: true, message: '请输入有效期', trigger: 'blur' },
     { pattern: /^(0[1-9]|1[0-2])\/\d{4}$/, message: '格式为MM/YYYY', trigger: 'blur' }
   ]
+}
+
+const getProductImage = (item) => {
+  if (item.description) {
+    const src = extractImageSrc(item.description)
+    if (src) return src
+  }
+  return '/images/splash.gif'
 }
 
 // 运费
@@ -447,23 +472,50 @@ onMounted(async () => {
 
 .shipping-options {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
-.shipping-option {
-  padding: 8px 0;
+.shipping-card {
+  flex: 1;
+  padding: 16px 20px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.option-name {
-  font-weight: 500;
+.shipping-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.shipping-card.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.shipping-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.shipping-name {
+  font-weight: 600;
+  font-size: 15px;
   color: #2c3e50;
 }
 
-.option-desc {
+.shipping-price {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.shipping-desc {
   font-size: 13px;
   color: #7f8c8d;
-  margin-top: 4px;
 }
 
 .summary-items {
@@ -473,9 +525,19 @@ onMounted(async () => {
 
 .summary-item {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
+}
+
+.item-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f5f0e6;
+  flex-shrink: 0;
 }
 
 .item-basic {
@@ -495,7 +557,7 @@ onMounted(async () => {
 
 .item-price {
   font-weight: 500;
-  color: #e74c3c;
+  color: var(--accent);
 }
 
 .summary-details {
@@ -529,7 +591,7 @@ onMounted(async () => {
 .detail-row.total .value.price {
   font-size: 24px;
   font-weight: 600;
-  color: #e74c3c;
+  color: var(--accent);
 }
 
 .submit-btn {
@@ -565,13 +627,13 @@ onMounted(async () => {
 }
 
 .address-option:hover {
-  border-color: #667eea;
-  background: #f8f9ff;
+  border-color: var(--accent);
+  background: var(--accent-bg);
 }
 
 .address-option.selected {
-  border-color: #667eea;
-  background: #f0f2ff;
+  border-color: var(--accent);
+  background: var(--accent-bg);
 }
 
 .address-header {
@@ -594,6 +656,10 @@ onMounted(async () => {
 @media (max-width: 768px) {
   .checkout-content {
     display: flex;
+    flex-direction: column;
+  }
+
+  .shipping-options {
     flex-direction: column;
   }
 }

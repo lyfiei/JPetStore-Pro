@@ -19,22 +19,22 @@ public class JwtInterceptor implements HandlerInterceptor {
             "/api/v1/auth/send-code",
             "/api/v1/auth/validate",
             "/api/v1/auth/oauth/github/authorize",
-            "/api/v1/auth/oauth/github/callback"
-    );
+            "/api/v1/auth/oauth/github/callback");
 
     @Autowired
     private JwtUtil jwtUtil;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-                             Object handler) throws Exception {
+            Object handler) throws Exception {
         String path = request.getRequestURI();
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
 
-        if (WHITELIST.contains(path)) {
+        if (WHITELIST.contains(path) || path.startsWith("/api/v1/categories") || path.startsWith("/api/v1/products")
+                || path.startsWith("/api/v1/items")) {
             return true;
         }
 

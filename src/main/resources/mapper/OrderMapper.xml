@@ -5,73 +5,71 @@
 <mapper namespace="com.csu.jpetstore.mapper.OrderMapper">
 
     <!-- Result Maps -->
-    <resultMap id="orderResultMap" type="Order">
-        <id property="orderId" column="order_id"/>
-        <result property="userId" column="user_id"/>
-        <result property="orderDate" column="order_date"/>
-        <result property="shipAddress1" column="ship_addr1"/>
-        <result property="shipAddress2" column="ship_addr2"/>
-        <result property="shipCity" column="ship_city"/>
-        <result property="shipState" column="ship_state"/>
-        <result property="shipZip" column="ship_zip"/>
-        <result property="shipCountry" column="ship_country"/>
-        <result property="billAddress1" column="bill_addr1"/>
-        <result property="billAddress2" column="bill_addr2"/>
-        <result property="billCity" column="bill_city"/>
-        <result property="billState" column="bill_state"/>
-        <result property="billZip" column="bill_zip"/>
-        <result property="billCountry" column="bill_country"/>
+    <resultMap id="orderResultMap" type="com.csu.jpetstore.domain.Order">
+        <id property="orderId" column="orderid"/>
+        <result property="username" column="userid"/>
+        <result property="orderDate" column="orderdate"/>
+        <result property="shipAddress1" column="shipaddr1"/>
+        <result property="shipAddress2" column="shipaddr2"/>
+        <result property="shipCity" column="shipcity"/>
+        <result property="shipState" column="shipstate"/>
+        <result property="shipZip" column="shipzip"/>
+        <result property="shipCountry" column="shipcountry"/>
+        <result property="billAddress1" column="billaddr1"/>
+        <result property="billAddress2" column="billaddr2"/>
+        <result property="billCity" column="billcity"/>
+        <result property="billState" column="billstate"/>
+        <result property="billZip" column="billzip"/>
+        <result property="billCountry" column="billcountry"/>
         <result property="courier" column="courier"/>
-        <result property="totalPrice" column="total_price"/>
-        <result property="billToFirstName" column="bill_to_firstname"/>
-        <result property="billToLastName" column="bill_to_lastname"/>
-        <result property="shipToFirstName" column="ship_to_firstname"/>
-        <result property="shipToLastName" column="ship_to_lastname"/>
-        <result property="creditCard" column="credit_card"/>
-        <result property="expiryDate" column="expiry_date"/>
-        <result property="cardType" column="card_type"/>
+        <result property="totalPrice" column="totalprice"/>
+        <result property="billToFirstName" column="billtofirstname"/>
+        <result property="billToLastName" column="billtolastname"/>
+        <result property="shipToFirstName" column="shiptofirstname"/>
+        <result property="shipToLastName" column="shiptolastname"/>
+        <result property="creditCard" column="creditcard"/>
+        <result property="expiryDate" column="exprdate"/>
+        <result property="cardType" column="cardtype"/>
         <result property="locale" column="locale"/>
-        <result property="shipAddressId" column="ship_address_id"/>
-        <result property="billAddressId" column="bill_address_id"/>
         <result property="status" column="status"/>
     </resultMap>
 
-    <resultMap id="lineItemResultMap" type="LineItem">
-        <id property="lineItemId" column="lineitem_id"/>
-        <id property="orderId" column="order_id"/>
-        <result property="itemId" column="item_id"/>
+    <resultMap id="lineItemResultMap" type="com.csu.jpetstore.domain.LineItem">
+        <id property="orderId" column="orderid"/>
+        <id property="lineNumber" column="linenum"/>
+        <result property="itemId" column="itemid"/>
         <result property="quantity" column="quantity"/>
         <result property="unitPrice" column="unitprice"/>
-        <association property="item" javaType="Item">
-            <id property="itemId" column="item_id"/>
+        <association property="item" javaType="com.csu.jpetstore.domain.Item">
+            <id property="itemId" column="itemid"/>
             <result property="listPrice" column="listprice"/>
         </association>
     </resultMap>
 
     <!-- Order Queries -->
     <select id="getOrdersByUsername" resultMap="orderResultMap">
-        SELECT * FROM orders WHERE user_id = #{username} ORDER BY order_date DESC
+        SELECT * FROM orders WHERE userid = #{username} ORDER BY orderdate DESC
     </select>
 
     <select id="getOrder" resultMap="orderResultMap">
-        SELECT * FROM orders WHERE order_id = #{orderId}
+        SELECT * FROM orders WHERE orderid = #{orderId}
     </select>
 
-    <insert id="insertOrder" parameterType="Order">
-        INSERT INTO orders (order_id, user_id, order_date, ship_addr1, ship_addr2, ship_city,
-                           ship_state, ship_zip, ship_country, bill_addr1, bill_addr2, bill_city,
-                           bill_state, bill_zip, bill_country, courier, total_price,
-                           bill_to_firstname, bill_to_lastname, ship_to_firstname, ship_to_lastname,
-                           credit_card, expiry_date, card_type, locale, ship_address_id, bill_address_id)
-        VALUES (#{orderId}, #{userId}, #{orderDate}, #{shipAddress1}, #{shipAddress2}, #{shipCity},
+    <insert id="insertOrder" parameterType="com.csu.jpetstore.domain.Order">
+        INSERT INTO orders (orderid, userid, orderdate, shipaddr1, shipaddr2, shipcity,
+                           shipstate, shipzip, shipcountry, billaddr1, billaddr2, billcity,
+                           billstate, billzip, billcountry, courier, totalprice,
+                           billtofirstname, billtolastname, shiptofirstname, shiptolastname,
+                           creditcard, exprdate, cardtype, locale)
+        VALUES (#{orderId}, #{username}, #{orderDate}, #{shipAddress1}, #{shipAddress2}, #{shipCity},
                 #{shipState}, #{shipZip}, #{shipCountry}, #{billAddress1}, #{billAddress2}, #{billCity},
                 #{billState}, #{billZip}, #{billCountry}, #{courier}, #{totalPrice},
                 #{billToFirstName}, #{billToLastName}, #{shipToFirstName}, #{shipToLastName},
-                #{creditCard}, #{expiryDate}, #{cardType}, #{locale}, #{shipAddressId}, #{billAddressId})
+                #{creditCard}, #{expiryDate}, #{cardType}, #{locale})
     </insert>
 
-    <insert id="insertOrderStatus" parameterType="Order">
-        INSERT INTO orderstatus (order_id, linenum, timestamp, status)
+    <insert id="insertOrderStatus" parameterType="com.csu.jpetstore.domain.Order">
+        INSERT INTO orderstatus (orderid, linenum, timestamp, status)
         VALUES (#{orderId}, 0, #{orderDate}, #{status})
     </insert>
 
@@ -79,13 +77,13 @@
     <select id="getLineItemsByOrderId" resultMap="lineItemResultMap">
         SELECT l.*, i.listprice
         FROM lineitem l
-        JOIN item i ON l.item_id = i.item_id
-        WHERE l.order_id = #{orderId}
+        JOIN item i ON l.itemid = i.itemid
+        WHERE l.orderid = #{orderId}
     </select>
 
-    <insert id="insertLineItem" parameterType="LineItem">
-        INSERT INTO lineitem (order_id, lineitem_id, item_id, quantity, unitprice)
-        VALUES (#{orderId}, #{lineItemId}, #{itemId}, #{quantity}, #{unitPrice})
+    <insert id="insertLineItem" parameterType="com.csu.jpetstore.domain.LineItem">
+        INSERT INTO lineitem (orderid, linenum, itemid, quantity, unitprice)
+        VALUES (#{orderId}, #{lineNumber}, #{itemId}, #{quantity}, #{unitPrice})
     </insert>
 
     <!-- Sequence Queries -->
@@ -93,17 +91,17 @@
         SELECT nextid FROM sequence WHERE name = #{name}
     </select>
 
-    <update id="updateSequence" parameterType="Sequence">
+    <update id="updateSequence" parameterType="com.csu.jpetstore.domain.Sequence">
         UPDATE sequence SET nextid = #{nextId} WHERE name = #{name}
     </update>
 
     <!-- Inventory Queries -->
     <update id="updateInventoryQuantity" parameterType="map">
-        UPDATE inventory SET qty = qty - #{increment} WHERE item_id = #{itemId}
+        UPDATE inventory SET qty = qty - #{increment} WHERE itemid = #{itemId}
     </update>
 
     <select id="getInventoryQuantity" resultType="int">
-        SELECT qty FROM inventory WHERE item_id = #{itemId}
+        SELECT qty FROM inventory WHERE itemid = #{itemId}
     </select>
 
 </mapper>

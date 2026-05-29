@@ -6,24 +6,9 @@
       <el-breadcrumb-item>搜索结果</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 搜索框 -->
+    <!-- 搜索标题 -->
     <div class="search-header">
-      <h1>搜索结果</h1>
-      <div class="search-box">
-        <el-input
-          v-model="keyword"
-          placeholder="搜索商品..."
-          size="large"
-          @keyup.enter="handleSearch"
-        >
-          <template #append>
-            <el-button type="primary" @click="handleSearch">
-              <el-icon><Search /></el-icon>
-              搜索
-            </el-button>
-          </template>
-        </el-input>
-      </div>
+      <h1>搜索结果：{{ keyword }}</h1>
     </div>
 
     <!-- 加载状态 -->
@@ -44,14 +29,14 @@
         >
           <div class="product-image">
             <img 
-              :src="getProductImage(product.productId)" 
+              :src="getProductImage(product)"
               :alt="product.name"
               @error="handleImageError"
             />
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
-            <p class="product-description">{{ product.description }}</p>
+            <p class="product-description">{{ stripHtml(product.description) }}</p>
             <el-button type="primary" @click.stop="viewProduct(product.productId)">
               查看详情
             </el-button>
@@ -68,10 +53,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Search } from '@element-plus/icons-vue'
 import { searchProducts } from '../api/product'
+import { stripHtml, extractImageSrc } from '../utils/format'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()
@@ -81,50 +66,30 @@ const loading = ref(false)
 const keyword = ref(route.query.keyword || '')
 const products = ref([])
 
-// 获取商品图片
-const getProductImage = (productId) => {
-  const imageMap = {
-    'FI-SW-01': '/images/fish1.jpg',
-    'FI-SW-02': '/images/fish2.jpg',
-    'K9-DL-01': '/images/dog1.jpg',
-  }
-  return imageMap[productId] || '/images/placeholder.png'
+// 获取商品图片（从描述中提取）
+const getProductImage = (product) => {
+  const src = extractImageSrc(product.description)
+  return src || '/images/splash.gif'
 }
 
 const handleImageError = (e) => {
-  e.target.src = '/images/placeholder.png'
+  e.target.src = '/images/splash.gif'
 }
 
-// 返回首页
 const goHome = () => {
   router.push('/')
 }
 
-// 查看商品详情
 const viewProduct = (productId) => {
   router.push(`/product/${productId}`)
 }
 
-// 执行搜索
-const handleSearch = () => {
-  if (!keyword.value.trim()) {
-    ElMessage.warning('请输入搜索关键字')
-    return
-  }
-  
-  // 更新URL
-  router.push({ path: '/search', query: { keyword: keyword.value } })
-  loadSearchResults()
-}
-
-// 加载搜索结果
-const loadSearchResults = async () => {
-  const searchKeyword = route.query.keyword
+const loadSearchResults = async (searchKeyword) => {
   if (!searchKeyword) return
 
   keyword.value = searchKeyword
   loading.value = true
-  
+
   try {
     const res = await searchProducts(searchKeyword)
     products.value = res.data || []
@@ -136,8 +101,14 @@ const loadSearchResults = async () => {
   }
 }
 
+watch(() => route.query.keyword, (newKeyword) => {
+  if (newKeyword) {
+    loadSearchResults(newKeyword)
+  }
+})
+
 onMounted(() => {
-  loadSearchResults()
+  loadSearchResults(route.query.keyword)
 })
 </script>
 
@@ -161,10 +132,6 @@ onMounted(() => {
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 20px;
-}
-
-.search-box {
-  max-width: 600px;
 }
 
 .loading-container {

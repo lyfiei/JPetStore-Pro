@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="400" viewBox="0 0 1400 400">
+  <defs>
+    <linearGradient id="g3" x1="0" x2="1">
+      <stop offset="0" stop-color="#dff7ff" />
+      <stop offset="1" stop-color="#4facfe" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#fff" rx="12"/>
+  <g fill="#333" font-family="Segoe UI, Roboto, sans-serif">
+    <text x="60" y="120" font-size="40" font-weight="700">玩具专区</text>
+    <text x="60" y="170" font-size="20">为宠物挑选高质量玩具，提升互动乐趣</text>
+  </g>
+  <g transform="translate(980,40)">
+    <circle cx="80" cy="80" r="60" fill="#ff8c1a" opacity="0.95" />
+    <text x="60" y="95" font-size="36" fill="#fff">🧸</text>
+  </g>
+</svg>

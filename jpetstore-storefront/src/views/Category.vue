@@ -9,7 +9,7 @@
     <!-- 分类标题 -->
     <div class="category-header">
       <h1>{{ categoryInfo?.name }}</h1>
-      <p class="category-description">{{ categoryInfo?.description }}</p>
+      <p class="category-description">{{ stripHtml(categoryInfo?.description) }}</p>
     </div>
 
     <!-- 加载状态 -->
@@ -27,14 +27,14 @@
       >
         <div class="product-image">
           <img 
-            :src="getProductImage(product.productId)" 
+            :src="getProductImage(product)"
             :alt="product.name"
             @error="handleImageError"
           />
         </div>
         <div class="product-info">
           <h3 class="product-name">{{ product.name }}</h3>
-          <p class="product-description">{{ product.description }}</p>
+          <p class="product-description">{{ stripHtml(product.description) }}</p>
           
           <!-- 商品规格 -->
           <div v-if="product.items && product.items.length > 0" class="product-items">
@@ -48,13 +48,13 @@
               <span class="item-stock" :class="{ 'out-of-stock': item.stock === 0 }">
                 {{ item.stock > 0 ? `库存: ${item.stock}` : '缺货' }}
               </span>
-              <el-button 
-                type="primary" 
+              <el-button
+                class="add-cart-btn"
                 size="small"
                 :disabled="item.stock === 0"
                 @click.stop="addToCart(item)"
               >
-                加入购物车
+                <el-icon><ShoppingCart /></el-icon> 加入购物车
               </el-button>
             </div>
           </div>
@@ -77,11 +77,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getCategoryWithProducts, getCategoryProductsWithItems } from '../api/product'
+import { ShoppingCart } from '@element-plus/icons-vue'
 import { useCartStore } from '../stores/cart'
+import { stripHtml, extractImageSrc } from '../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -91,19 +93,14 @@ const loading = ref(false)
 const categoryInfo = ref(null)
 const products = ref([])
 
-// 获取商品图片（使用占位图）
-const getProductImage = (productId) => {
-  // 这里可以根据实际产品ID映射到具体图片
-  const imageMap = {
-    'FI-SW-01': '/images/fish1.jpg',
-    'FI-SW-02': '/images/fish2.jpg',
-    'K9-DL-01': '/images/dog1.jpg',
-  }
-  return imageMap[productId] || '/images/placeholder.png'
+// 获取商品图片
+const getProductImage = (product) => {
+  const src = extractImageSrc(product.description)
+  return src || '/images/splash.gif'
 }
 
 const handleImageError = (e) => {
-  e.target.src = '/images/placeholder.png'
+  e.target.src = '/images/splash.gif'
 }
 
 // 查看商品详情
@@ -166,6 +163,10 @@ const loadCategoryData = async () => {
 onMounted(() => {
   loadCategoryData()
 })
+
+watch(() => route.params.categoryId, () => {
+  loadCategoryData()
+})
 </script>
 
 <style scoped>
@@ -183,7 +184,7 @@ onMounted(() => {
   text-align: center;
   margin-bottom: 40px;
   padding: 30px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
   border-radius: 12px;
   color: white;
 }
@@ -292,7 +293,7 @@ onMounted(() => {
 .item-price {
   font-size: 20px;
   font-weight: 600;
-  color: #e74c3c;
+  color: var(--accent);
   min-width: 80px;
 }
 
@@ -309,6 +310,19 @@ onMounted(() => {
 .view-detail-btn {
   align-self: flex-start;
   margin-top: auto;
+}
+
+.add-cart-btn {
+  background: #2d7a4f !important;
+  border-color: #2d7a4f !important;
+  color: #fff !important;
+}
+
+.add-cart-btn.is-disabled,
+.add-cart-btn:disabled {
+  background: #c0c8b8 !important;
+  border-color: #c0c8b8 !important;
+  color: rgba(255,255,255,0.7) !important;
 }
 
 @media (max-width: 768px) {

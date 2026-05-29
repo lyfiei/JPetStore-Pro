@@ -1,5 +1,7 @@
 package com.csu.jpetstore.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -28,12 +30,23 @@ public class Item implements Serializable {
         this.itemId = itemId.trim();
     }
 
+    @JsonIgnore
     public int getQuantity() {
         return quantity;
     }
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @JsonProperty("stock")
+    public int getStock() {
+        return quantity;
+    }
+
+    @JsonProperty("stock")
+    public void setStock(int stock) {
+        this.quantity = stock;
     }
 
     public Product getProduct() {
