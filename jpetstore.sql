@@ -476,3 +476,10 @@ ADD COLUMN `is_default` tinyint(1) DEFAULT 0 AFTER `country`;
 
 -- 为现有数据设置一个默认地址(可选)
 UPDATE `address` SET `is_default` = 1 WHERE `address_id` = 1 LIMIT 1;
+
+
+-- 添加status字段到orders表
+ALTER TABLE `orders`
+    ADD COLUMN `status` varchar(2) DEFAULT 'P' AFTER `locale`;
+
+UPDATE `orders` SET `status` = 'P' WHERE `status` IS NULL;

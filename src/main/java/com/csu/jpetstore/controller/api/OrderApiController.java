@@ -25,11 +25,23 @@ public class OrderApiController {
                                                      @RequestParam(defaultValue = "10") int pageSize,
                                                      HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
-        List<Order> orders = orderService.getOrdersByUsername(username);
+        List<Order> allOrders = orderService.getOrdersByUsername(username);
+        
+        // 计算分页
+        int total = allOrders.size();
+        int fromIndex = (page - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, total);
+        
+        List<Order> pagedOrders = allOrders;
+        if (fromIndex < total) {
+            pagedOrders = allOrders.subList(fromIndex, toIndex);
+        } else {
+            pagedOrders = new ArrayList<>();
+        }
 
         Map<String, Object> data = new HashMap<>();
-        data.put("list", orders);
-        data.put("total", orders.size());
+        data.put("list", pagedOrders);
+        data.put("total", total);
         data.put("page", page);
         data.put("pageSize", pageSize);
         return Result.success(data);

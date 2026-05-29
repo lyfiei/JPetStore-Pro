@@ -45,13 +45,13 @@
           >
             <div class="item-image">
               <img 
-                :src="getItemImage(item.itemId)" 
-                alt="商品图片"
+                :src="getItemImage(item)"
+                :alt="item.productName || item.itemId"
                 @error="handleImageError"
               />
             </div>
             <div class="item-info">
-              <h4 class="item-name">{{ item.productName || '商品' }}</h4>
+              <h4 class="item-name">{{ item.productName || item.itemId }}</h4>
               <p class="item-id">商品编号: {{ item.itemId }}</p>
             </div>
             <div class="item-details">
@@ -194,12 +194,36 @@ const getStatusType = (status) => {
 }
 
 // 获取商品图片
-const getItemImage = (itemId) => {
-  return '/images/placeholder.png'
+const getItemImage = (item) => {
+  if (!item) return '/images/logo-parrot.svg'
+
+  // 如果有 productImageUrl，从 descn 字段中提取图片路径
+  if (item.productImageUrl) {
+    const match = item.productImageUrl.match(/src="([^"]+)"/)
+    if (match && match[1]) {
+      // descn 中的路径是 ../images/xxx.gif，需要转换为 /images/xxx.gif
+      return match[1].replace('../images/', '/images/')
+    }
+  }
+
+  // 如果没有，根据 itemId 前缀返回类别图片
+  if (item.itemId) {
+    const prefix = item.itemId.substring(0, 2)
+    const imageMap = {
+      'AV': '/images/bird-category.jpg',
+      'FI': '/images/fish-category.jpg',
+      'FL': '/images/cat-category.jpg',
+      'K9': '/images/dog-category.jpg',
+      'RP': '/images/reptile-category.jpg'
+    }
+    return imageMap[prefix] || '/images/logo-parrot.svg'
+  }
+
+  return '/images/logo-parrot.svg'
 }
 
 const handleImageError = (e) => {
-  e.target.src = '/images/placeholder.png'
+  e.target.src = '/images/logo-parrot.svg'
 }
 
 // 格式化收货地址

@@ -17,6 +17,8 @@ public class LineItem implements Serializable {
     private BigDecimal unitPrice;
     private Item item;
     private BigDecimal total;
+    private String productName;
+    private String productImageUrl;
 
     public LineItem() {
     }

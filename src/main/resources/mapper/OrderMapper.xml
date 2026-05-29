@@ -40,9 +40,12 @@
         <result property="itemId" column="itemid"/>
         <result property="quantity" column="quantity"/>
         <result property="unitPrice" column="unitprice"/>
+        <result property="productName" column="productname"/>
+        <result property="productImageUrl" column="productimageurl"/>
         <association property="item" javaType="com.csu.jpetstore.domain.Item">
             <id property="itemId" column="itemid"/>
             <result property="listPrice" column="listprice"/>
+            <result property="productId" column="productid"/>
         </association>
     </resultMap>
 
@@ -75,9 +78,11 @@
 
     <!-- LineItem Queries -->
     <select id="getLineItemsByOrderId" resultMap="lineItemResultMap">
-        SELECT l.*, i.listprice
+        SELECT l.*, i.listprice, i.productid, p.name as productname,
+               p.descn as productimageurl
         FROM lineitem l
         JOIN item i ON l.itemid = i.itemid
+        LEFT JOIN product p ON i.productid = p.productid
         WHERE l.orderid = #{orderId}
     </select>
 
