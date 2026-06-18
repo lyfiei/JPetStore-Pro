@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 // 创建 axios 实例
 const request = axios.create({
-  baseURL: 'http://localhost:8080/api/v1', // 后端 API 地址
+  baseURL: '/api/v1', // 后端 API 地址（相对路径，适配所有环境）
   timeout: 10000
 })
 
