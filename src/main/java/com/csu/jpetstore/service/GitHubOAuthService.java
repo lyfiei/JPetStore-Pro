@@ -14,13 +14,13 @@ import java.util.*;
 @Service
 public class GitHubOAuthService {
 
-    @Value("${github.oauth.client-id}")
+    @Value("${github.oauth.client-id:}")
     private String clientId;
 
-    @Value("${github.oauth.client-secret}")
+    @Value("${github.oauth.client-secret:}")
     private String clientSecret;
 
-    @Value("${github.oauth.redirect-uri}")
+    @Value("${github.oauth.redirect-uri:}")
     private String redirectUri;
 
     @Autowired

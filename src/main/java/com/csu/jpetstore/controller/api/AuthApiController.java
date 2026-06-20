@@ -38,7 +38,7 @@ public class AuthApiController {
     @Autowired
     private GitHubOAuthService gitHubOAuthService;
 
-    @Value("${app.frontend-url}")
+    @Value("${app.frontend-url:}")
     private String frontendUrl;
 
     private final ConcurrentHashMap<String, CodeEntry> codeStore = new ConcurrentHashMap<>();
