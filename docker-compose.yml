@@ -47,7 +47,7 @@ services:
       - petstore-network
 
   petstore-admin:
-    build: ../../GitHub/JPetStore_backend
+    build: ../JPetstore_Admin
     container_name: petstore-admin
     restart: unless-stopped
     depends_on:

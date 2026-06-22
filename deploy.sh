@@ -12,8 +12,8 @@ echo "  JPetStore Docker 一键部署"
 echo "=============================="
 
 # ---------- 配置 ----------
-JPETSTORE_DIR="/opt/JPetStore"
-ADMIN_DIR="/GitHub/JPetStore_backend"
+JPETSTORE_DIR="/data/workspace/JPetStore-Pro"
+ADMIN_DIR="/data/workspace/JPetstore_Admin"
 JPETSTORE_REPO="https://github.com/lyfiei/JPetStore-Pro.git"
 ADMIN_REPO="https://github.com/lyfiei/JPetstore_Admin.git"
 
@@ -37,11 +37,11 @@ fi
 # ---------- 3. 克隆后台管理项目 ----------
 if [ ! -d "$ADMIN_DIR" ]; then
     echo "[STEP] 克隆后台管理项目: $ADMIN_REPO"
-    sudo mkdir -p "$(dirname "$ADMIN_DIR")"
-    sudo git clone "$ADMIN_REPO" "$ADMIN_DIR"
+    mkdir -p "$(dirname "$ADMIN_DIR")"
+    git clone "$ADMIN_REPO" "$ADMIN_DIR"
 else
     echo "[OK] 后台管理项目已存在: $ADMIN_DIR"
-    cd "$ADMIN_DIR" && sudo git pull && cd - > /dev/null
+    cd "$ADMIN_DIR" && git pull && cd - > /dev/null
 fi
 
 # ---------- 4. 进入前台项目，构建并启动 ----------
