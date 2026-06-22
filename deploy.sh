@@ -17,6 +17,17 @@ ADMIN_DIR="/data/workspace/JPetstore_Admin"
 JPETSTORE_REPO="https://github.com/lyfiei/JPetStore-Pro.git"
 ADMIN_REPO="https://github.com/lyfiei/JPetstore_Admin.git"
 
+# ---------- 检测 Docker Compose 命令 ----------
+if docker compose version > /dev/null 2>&1; then
+    DC="docker compose"
+elif docker-compose version > /dev/null 2>&1; then
+    DC="docker-compose"
+else
+    echo "[ERROR] 未找到 docker compose，请安装 Docker Compose 插件"
+    exit 1
+fi
+echo "[OK] 使用: $DC"
+
 # ---------- 1. 检查 Docker ----------
 if ! docker info > /dev/null 2>&1; then
     echo "[ERROR] Docker 未运行，请先执行: sudo systemctl start docker"
@@ -49,7 +60,7 @@ cd "$JPETSTORE_DIR"
 
 echo ""
 echo "[STEP] 构建镜像并启动所有容器..."
-docker-compose up -d --build
+$DC up -d --build
 
 # ---------- 5. 等待服务就绪 ----------
 echo ""
@@ -59,12 +70,12 @@ sleep 15
 # ---------- 6. 运行状态 ----------
 echo ""
 echo "[STEP] 容器运行状态:"
-docker-compose ps
+$DC ps
 
 echo ""
 echo "=============================="
 echo "  部署完成！"
 echo "  前台访问: http://localhost"
 echo "  后台管理: http://localhost:81"
-echo "  查看日志: docker-compose logs -f"
+echo "  查看日志: $DC logs -f"
 echo "=============================="
