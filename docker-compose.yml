@@ -1,0 +1,74 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: petstore-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root123}
+      MYSQL_DATABASE: jpetstore
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./jpetstore.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - petstore-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  petstore-backend:
+    build: .
+    container_name: petstore-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: jpetstore
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:-root123}
+    networks:
+      - petstore-network
+
+  petstore-frontend:
+    build: ./jpetstore-storefront
+    container_name: petstore-frontend
+    restart: unless-stopped
+    depends_on:
+      - petstore-backend
+    ports:
+      - "80:80"
+    networks:
+      - petstore-network
+
+  petstore-admin:
+    build: ../../GitHub/JPetStore_backend
+    container_name: petstore-admin
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      petstore-backend:
+        condition: service_started
+    ports:
+      - "81:8080"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: jpetstore
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:-root123}
+    networks:
+      - petstore-network
+
+networks:
+  petstore-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

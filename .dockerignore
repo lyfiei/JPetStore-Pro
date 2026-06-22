@@ -1,0 +1,13 @@
+.git
+.gitignore
+.idea
+.vscode
+.claude
+.agents
+.github
+target
+*.md
+*.log
+mvnw
+mvnw.cmd
+.mvn

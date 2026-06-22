@@ -19,7 +19,7 @@ mybatis.type-aliases-package=com.csu.jpetstore.domain
 mybatis.configuration.map-underscore-to-camel-case=true
 
 # JWT
-jwt.secret=JPetStore2024SecretKey!@#$
+jwt.secret=你的JWT密钥（用于Token签名，可自定义，与数据库密码无关）
 jwt.expiration=86400000
 
 # GitHub OAuth（可选，不填则 GitHub 登录不可用）
